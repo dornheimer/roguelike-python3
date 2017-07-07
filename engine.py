@@ -44,7 +44,8 @@ def main():
     entities = [npc, player]
 
     ### Console
-    libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    # libtcod.console_set_custom_font('terminal10x16_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    libtcod.console_set_custom_font('terminal16x16_gs_ro.png', libtcod.FONT_LAYOUT_ASCII_INROW)
     libtcod.console_init_root(screen_width, screen_height, 'rl-py3', False)
     con = libtcod.console_new(screen_width, screen_height)
 

@@ -1,4 +1,5 @@
 import libtcodpy as libtcod
+from random import randint
 
 
 def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width,
@@ -14,17 +15,21 @@ def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width,
 
                 if visible:
                     if wall:
-                        libtcod.console_set_char_background(con, x, y, colors.get('light_wall'))
+                        # libtcod.console_set_char_background(con, x, y, colors.get('light_wall'))
+                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.darker_han, libtcod.desaturated_azure)
                     else:
-                        libtcod.console_set_char_background(con, x, y, colors.get('light_ground'))
+                        # libtcod.console_set_char_background(con, x, y, colors.get('light_ground'))
+                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.dark_grey, libtcod.darker_han)
 
                     game_map.tiles[x][y].explored = True
 
                 elif game_map.tiles[x][y].explored:
                     if wall:
-                        libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'))
+                        # libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'))
+                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.darkest_grey, libtcod.darkest_azure)
                     else:
-                        libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'))
+                        # libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'))
+                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.darker_grey, libtcod.darkest_han)
 
     # Entities
     for entity in entities:
