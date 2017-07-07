@@ -1,6 +1,7 @@
 import libtcodpy as libtcod
 
 def handle_keys(key):
+    """Key bindings"""
     # Movement (arrow keys)
     if key.vk == libtcod.KEY_UP:
         return {'move': (0, -1)}
