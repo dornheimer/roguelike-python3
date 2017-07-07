@@ -1,7 +1,7 @@
 import libtcodpy as libtcod
 
 def initialize_fov(game_map):
-    """Returns a map that defines which tiles are lit."""
+    """Initializes a FOV map that defines which tiles are lit."""
     fov_map = libtcod.map_new(game_map.width, game_map.height)
 
     for y in range(game_map.height):
@@ -10,3 +10,7 @@ def initialize_fov(game_map):
                                         not game_map.tiles[x][y].blocked)
 
     return fov_map
+
+def recompute_fov(fov_map, x, y, radius, light_walls=True, algorithm=0):
+    """Recomputes the FOV map after player movement."""
+    libtcod.map_compute_fov(fov_map, x, y, radius, light_walls, algorithm)
