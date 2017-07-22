@@ -4,7 +4,7 @@ from random import randint
 
 def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width,
                 screen_height, colors):
-    """Draws all tiles in the game (FOV) map and all entities in the list."""
+    """Draw all tiles on the game (FOV) map and all entities in the list."""
     # Game map
     if fov_recompute:
         for y in range(game_map.height):
