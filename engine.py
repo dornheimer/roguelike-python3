@@ -1,7 +1,7 @@
 import libtcodpy as libtcod
 
 from components.fighter import Fighter
-from death_functions impoer kill_monster, kill_player
+from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
 from game_states import GameStates
