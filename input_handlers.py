@@ -8,6 +8,8 @@ def handle_keys(key, game_state):
         return handle_player_turn_keys(key)
     elif game_state == GameStates.PLAYER_DEAD:
         return handle_player_dead_keys(key)
+    elif game_state == GameStates.TARGETING:
+        return handle_targeting_keys(key)
     elif game_state in {GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY}:
         return handle_inventory_keys(key)
 
@@ -56,6 +58,32 @@ def handle_player_turn_keys(key):
     # No key was pressed
     return {}
 
+def handle_targeting_keys(key):
+    """Key bindings while targeting."""
+    # if key.vk in {libtcod.KEY_UP, libtcod.KEY_KP8} or key_char == 'k':
+    #     return {'select_target': (0, -1)}
+    # elif key.vk in {libtcod.KEY_DOWN, libtcod.KEY_KP2} or key_char == 'j':
+    #     return {'select_target': (0, 1)}
+    # elif key.vk in {libtcod.KEY_LEFT, libtcod.KEY_KP4} or key_char == 'h':
+    #     return {'select_target': (-1, 0)}
+    # elif key.vk in {libtcod.KEY_RIGHT, libtcod.KEY_KP6} or key_char == 'l':
+    #     return {'select_target': (1, 0)}
+    # elif key.vk == libtcod.KEY_KP1 or key_char == 'b':
+    #     return {'select_target': (-1, 1)}
+    # elif key.vk == libtcod.KEY_KP3 or key_char == 'n':
+    #     return {'select_target': (1, 1)}
+    # elif key.vk == libtcod.KEY_KP5:
+    #     return {'select_target': (0, 0)}
+    # elif key.vk == libtcod.KEY_KP7 or key_char == 'z':
+    #     return {'select_target': (-1, -1)}
+    # elif key.vk == libtcod.KEY_KP9 or key_char == 'n':
+    #     return {'select_target': (1, -1)}
+    # elif if key.vk == libtcod.KEY_ENTER:
+    #     return {'confirm': True}
+    if key.vk == libtcod.KEY_ESCAPE:
+        return {'exit': True}
+
+    return {}
 
 def handle_player_dead_keys(key):
     """Define key bindings for when the player is dead."""
@@ -71,6 +99,16 @@ def handle_player_dead_keys(key):
 
     return {}
 
+def handle_mouse(mouse):
+    """Handle mouse input."""
+    (x, y) = (mouse.cx, mouse.cy)
+
+    if mouse.lbutton_pressed:
+        return {'left_click': (x, y)}
+    elif mouse.rbutton_pressed:
+        return {'right_click': (x, y)}
+
+    return {}
 
 def handle_inventory_keys(key):
     """Define key bindings for when the inventory is shown."""
