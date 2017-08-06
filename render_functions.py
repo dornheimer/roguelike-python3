@@ -23,6 +23,24 @@ def get_names_under_mouse(mouse, entities, fov_map):
 
     return names.capitalize()
 
+def show_target(cursor, mouse, key, map_width, map_height, targeting_item):
+    """Show target and impact radius (when applicable)."""
+    (x, y) = (mouse.cx, mouse.cy)
+    # Check if item component has a radius defined
+    item_component = targeting_item.item
+    radius = item_component.function_kwargs.get('radius')
+
+    libtcod.console_clear(cursor)
+    #libtcod.console_set_key_color(cursor, libtcod.black)
+
+    if radius:
+        for a in range(x - radius, x + radius + 1):
+            for b in range(y - radius, y + radius + 1):
+                libtcod.console_set_char_background(cursor, a, b, targeting_item.color)
+    else:
+        libtcod.console_set_char_background(cursor, x, y, libtcod.white)
+
+    libtcod.console_blit(cursor, 0, 0, map_width, map_height, 0, 0, 0, 1.0, 0.5)
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
     """Draw health bar in bottom panel console."""
@@ -40,8 +58,8 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
                             libtcod.CENTER, '{0}: {1}/{2}'.format(name, value, maximum))
 
 
-def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width,
-                screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state):
+def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width,
+                screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state, targeting_item, key):
     """Draw all tiles on the game (FOV) map and all entities in the list."""
     ### Game map
     if fov_recompute:
@@ -79,6 +97,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
     libtcod.console_set_default_background(con, libtcod.black)
 
+
     ### Panel console
     libtcod.console_set_default_background(panel, libtcod.black)
     libtcod.console_clear(panel)
@@ -107,6 +126,9 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
             inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
 
         inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+
+    if game_state == GameStates.TARGETING:
+        show_target(cursor, mouse, key, game_map.width, game_map.height, targeting_item)
 
 def clear_all(con, entities):
     """Erase characters of all entities."""

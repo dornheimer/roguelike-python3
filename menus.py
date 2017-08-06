@@ -10,7 +10,7 @@ def menu(con, header, options, width, screen_width, screen_height):
     height = len(options) + header_height
 
     # Create an off-screen console that represents the menu's window
-    window =  libtcod.console_new(width, height)
+    window = libtcod.console_new(width, height)
 
     # Print the header, with auto-wrap
     libtcod.console_set_default_foreground(window, libtcod.white)

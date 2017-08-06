@@ -13,7 +13,7 @@ from loader_functions.data_loaders import load_game, save_game
 from menus import main_menu, message_box
 from render_functions import clear_all, render_all
 
-def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
+def play_game(player, entities, game_map, message_log, game_state, con, panel, cursor, constants):
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
@@ -34,10 +34,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             recompute_fov(fov_map, player.x, player.y, constants['fov_radius'],
                             constants['fov_light_walls'], constants['fov_algorithm'])
 
-        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute,
+        render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_recompute,
                     message_log, constants['screen_width'], constants['screen_height'],
                     constants['bar_width'], constants['panel_height'], constants['panel_y'],
-                    mouse, constants['colors'], game_state)
+                    mouse, constants['colors'], game_state, targeting_item, key)
 
         fov_recompute = False
 
@@ -112,6 +112,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     player_turn_results.extend((player.inventory.drop_item(item)))
 
         if game_state == GameStates.TARGETING:
+            if select_target:
+                current_x, current_y = player.x, player.y
+                dx, dy = select_target
+                new_x, new_y = current_x + dx, current_y + dy
 
             if left_click:
                 target_x, target_y = left_click
@@ -127,6 +131,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 game_state = previous_game_state
             elif game_state == GameStates.TARGETING:
                 player_turn_results.append({'targeting_cancelled': True})
+            elif game_state == GameStates.PLAYER_DEAD:
+                # Delete save file if player exits after dying
+                if os.path.isfile('savegame.dat'):
+                    os.remove('savegame.dat')
             else:
                 save_game(player, entities, game_map, message_log, game_state)
                 return True
@@ -213,10 +221,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             else:
                 game_state = GameStates.PLAYER_TURN
 
-        elif game_state == GameStates.PLAYER_DEAD:
-        # Delete save file if player exits after dying
-            if os.path.isfile('savegame.dat'):
-                os.remove('savegame.dat')
 
 def main():
     """Main loop.
@@ -233,6 +237,7 @@ def main():
 
     con = libtcod.console_new(constants['screen_width'], constants['screen_height'])
     panel = libtcod.console_new(constants['screen_width'], constants['panel_height'])
+    cursor = libtcod.console_new(constants['map_width'], constants['map_height'])
 
     # Initialize game variables
     player = None
@@ -286,7 +291,7 @@ def main():
 
         else:
             libtcod.console_clear(con)
-            play_game(player, entities, game_map, message_log, game_state, con, panel, constants)
+            play_game(player, entities, game_map, message_log, game_state, con, panel, cursor, constants)
 
             show_main_menu = True
 

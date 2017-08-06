@@ -149,19 +149,18 @@ class GameMap:
                 elif item_chance < 70:
                     item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
                         'Left-click a target tile for the fireball or right-click to cancel.', libtcod.light_cyan),
-                                        damage=12, radius=3)
+                                        damage=12, radius=2)
                     item = Entity(x, y, '#', libtcod.orange, 'Fireball Scroll', render_order=RenderOrder.ITEM,
                                 item=item_component)
                 elif item_chance < 80:
                     item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
-                        'Left-click on an enemy to confuse it or right-click to cancel.', libtcod.light_cyan),
-                                        damage=12, radius=3)
+                        'Left-click on an enemy to confuse it or right-click to cancel.', libtcod.light_cyan))
                     item = Entity(x, y, '#', libtcod.light_pink, 'Confusion Scroll', render_order=RenderOrder.ITEM,
                                 item=item_component)
                 elif item_chance < 90:
                     item_component = Item(use_function=cast_freeze, targeting=True, targeting_message=Message(
                         'Left-click a target tile to freeze the area around it or right-click to cancel.', libtcod.light_cyan),
-                                        damage=2, radius=4)
+                                        damage=2, radius=1)
                     item = Entity(x, y, '#', libtcod.light_blue, 'Freezing Scroll', render_order=RenderOrder.ITEM,
                                 item=item_component)
                 else:
