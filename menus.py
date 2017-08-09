@@ -39,6 +39,15 @@ def inventory_menu(con, header, inventory, inventory_width, screen_width, screen
 
     menu(con, header, options, inventory_width, screen_width, screen_height)
 
+def equipment_menu(con, header, inventory, inventory_width, screen_width, screen_height):
+    """Show a menu with each item of the inventory as an option."""
+    if len(inventory.equipment) == 0:
+        options = ['Nothing equipped yet.']
+    else:
+        options = [item.name for item in inventory.equipment]
+
+    menu(con, header, options, inventory_width, screen_width, screen_height)
+
 def main_menu(con, background_image, screen_width, screen_height):
     libtcod.image_blit_2x(background_image, 0, 0, 0)
 
@@ -51,4 +60,5 @@ def main_menu(con, background_image, screen_width, screen_height):
     menu(con, '', ['new game', 'continue last game', 'quit'], 24, screen_width, screen_height)
 
 def message_box(con, header, width, screen_width, screen_height):
+    """Show message box."""
     menu(con, header, [], width, screen_width, screen_height)

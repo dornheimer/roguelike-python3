@@ -2,7 +2,7 @@ import libtcodpy as libtcod
 
 from enum import Enum
 from game_states import GameStates
-from menus import inventory_menu
+from menus import inventory_menu, equipment_menu
 
 
 class RenderOrder(Enum):
@@ -119,13 +119,16 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
 
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
-    if game_state in {GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY}:
+    if game_state in {GameStates.SHOW_INVENTORY, GameStates.SHOW_EQUIPMENT, GameStates.DROP_INVENTORY}:
         if game_state == GameStates.SHOW_INVENTORY:
             inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
-        else:
+            inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+        elif game_state == GameStates.DROP_INVENTORY:
             inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
-
-        inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+            inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+        else:
+            inventory_title = 'Press the key next to an item to unequip it and move it back to inventory, or Esc to cancel.\n'
+            equipment_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
 
     if game_state == GameStates.TARGETING:
         show_target(cursor, mouse, key, game_map.width, game_map.height, targeting_item)

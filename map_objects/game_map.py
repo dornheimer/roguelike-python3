@@ -6,9 +6,11 @@ from components.fighter import Fighter
 from components.item import Item
 from entity import Entity
 from game_messages import Message
-from item_functions import cast_confuse, cast_fireball, cast_freeze, cast_lightning, heal
+from map_objects.items import consumables, equipment
+from map_objects.monsters import monsters
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
+from random_utils import random_choice_from_dict
 from render_functions import RenderOrder
 
 
@@ -111,6 +113,10 @@ class GameMap:
         number_of_monsters = randint(0, max_monsters_per_room)
         number_of_items = randint(0, max_items_per_room)
 
+        monster_chances = {m['id']: m['spawn_chance'] for m in monsters}
+        consumables_chances = {c['id']: c['drop_chance'] for c in consumables}
+        equipment_chances = {e['id']: e['drop_chance'] for e in equipment}
+
         ### Monsters
         for i in range(number_of_monsters):
             # Choose a random location in the room
@@ -118,20 +124,18 @@ class GameMap:
             y = randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                if randint(0, 100) < 80:
-                    fighter_component = Fighter(hp=10, defense=0, power=3)
-                    ai_component = BasicMonster()
+                monster_choice = random_choice_from_dict(monster_chances)
 
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True,
-                                    render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
-                else:
-                    fighter_component = Fighter(hp=16, defense=1, power=4)
-                    ai_component = BasicMonster()
+                for monster in monsters:
+                    if monster_choice == monster['id']:
+                        fighter_component = Fighter(**monster['kwargs'])
+                        ai_component = BasicMonster()
+                        char, color, name = monster['char'], monster['color'], monster['name']
 
-                    monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', blocks=True,
-                                    render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                        creature = Entity(x, y, char, color, name, blocks=True,
+                                        render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
-                entities.append(monster)
+                entities.append(creature)
 
         ### Items
         for i in range(number_of_items):
@@ -139,34 +143,29 @@ class GameMap:
             y = randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                item_chance = randint(0, 100)
+                select_item_pool = randint(0, 100)
 
-                if item_chance < 60:
-                    item_component = Item(use_function=heal, amount=4)
-                    item = Entity(x, y, '!', libtcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM,
-                                item=item_component)
+                if select_item_pool < 80:
+                    item_choice = random_choice_from_dict(consumables_chances)
 
-                elif item_chance < 70:
-                    item_component = Item(use_function=cast_fireball, targeting=True, targeting_message=Message(
-                        'Left-click a target tile for the fireball or right-click to cancel.', libtcod.light_cyan),
-                                        damage=12, radius=2)
-                    item = Entity(x, y, '#', libtcod.orange, 'Fireball Scroll', render_order=RenderOrder.ITEM,
-                                item=item_component)
-                elif item_chance < 80:
-                    item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message(
-                        'Left-click on an enemy to confuse it or right-click to cancel.', libtcod.light_cyan))
-                    item = Entity(x, y, '#', libtcod.light_pink, 'Confusion Scroll', render_order=RenderOrder.ITEM,
-                                item=item_component)
-                elif item_chance < 90:
-                    item_component = Item(use_function=cast_freeze, targeting=True, targeting_message=Message(
-                        'Left-click a target tile to freeze the area around it or right-click to cancel.', libtcod.light_cyan),
-                                        damage=2, radius=1)
-                    item = Entity(x, y, '#', libtcod.light_blue, 'Freezing Scroll', render_order=RenderOrder.ITEM,
-                                item=item_component)
+                    for consumable in consumables:
+                        if item_choice == consumable['id']:
+                            item_component = Item(**consumable['kwargs'])
+                            char, color, name = consumable['char'], consumable['color'], consumable['name']
+
+                            item = Entity(x, y, char, color, name, render_order=RenderOrder.ITEM,
+                                        item=item_component)
+
                 else:
-                    item_component = Item(use_function=cast_lightning, damage=20, maximum_range=5)
-                    item = Entity(x, y, '#', libtcod.yellow, 'Lightning Scroll', render_order=RenderOrder.ITEM,
-                                item=item_component)
+                    item_choice = random_choice_from_dict(equipment_chances)
+
+                    for equipable in equipment:
+                        if item_choice == equipable['id']:
+                            item_component = Item(**equipable['kwargs'])
+                            char, color, name = equipable['char'], equipable['color'], equipable['name']
+
+                            item = Entity(x, y, char, color, name, render_order=RenderOrder.ITEM,
+                                        item=item_component)
 
                 entities.append(item)
 

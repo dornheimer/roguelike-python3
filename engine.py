@@ -53,6 +53,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         move = action.get('move')
         pickup = action.get('pickup')
         show_inventory = action.get('show_inventory')
+        show_equipment = action.get('show_equipment')
         drop_inventory = action.get('drop_inventory')
         inventory_index = action.get('inventory_index')
         select_target = action.get('select_target')
@@ -98,6 +99,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             previous_game_state = game_state
             game_state = GameStates.SHOW_INVENTORY
 
+        if show_equipment:
+            previous_game_state = game_state
+            game_state = GameStates.SHOW_EQUIPMENT
+
         if drop_inventory:
             previous_game_state = game_state
             game_state = GameStates.DROP_INVENTORY
@@ -107,7 +112,16 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 item = player.inventory.items[inventory_index]
 
                 if game_state == GameStates.SHOW_INVENTORY:
-                    player_turn_results.extend((player.inventory.use(item, entities=entities, fov_map=fov_map)))
+                    if item.item.equip:
+                        player_turn_results.extend((player.inventory.equip(item, player)))
+                    else:
+                        player_turn_results.extend((player.inventory.use(item, entities=entities, fov_map=fov_map)))
+
+                elif game_state == GameStates.SHOW_EQUIPMENT:
+                    if inventory_index < len(player.inventory.equipment):
+                        item = player.inventory.equipment[inventory_index]
+                        player_turn_results.extend((player.inventory.unequip(item, player)))
+
                 elif game_state == GameStates.DROP_INVENTORY:
                     player_turn_results.extend((player.inventory.drop_item(item)))
 
@@ -127,7 +141,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 player_turn_results.append({'targeting_cancelled': True})
 
         if exit:
-            if game_state in {GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY}:
+            if game_state in {GameStates.SHOW_INVENTORY, GameStates.SHOW_EQUIPMENT, GameStates.DROP_INVENTORY}:
                 game_state = previous_game_state
             elif game_state == GameStates.TARGETING:
                 player_turn_results.append({'targeting_cancelled': True})
@@ -135,6 +149,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 # Delete save file if player exits after dying
                 if os.path.isfile('savegame.dat'):
                     os.remove('savegame.dat')
+                return True
             else:
                 save_game(player, entities, game_map, message_log, game_state)
                 return True
@@ -148,6 +163,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             dead_entity = player_turn_result.get('dead')
             item_added = player_turn_result.get('item_added')
             item_consumed = player_turn_result.get('consumed')
+            item_equipped = player_turn_result.get('equipped')
             item_dropped = player_turn_result.get('item_dropped')
             targeting = player_turn_result.get('targeting')
             targeting_cancelled = player_turn_result.get('targeting_cancelled')
@@ -175,6 +191,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 game_state = GameStates.ENEMY_TURN
 
             if item_consumed:
+                game_state = GameStates.ENEMY_TURN
+
+            if item_equipped:
                 game_state = GameStates.ENEMY_TURN
 
             if targeting:
