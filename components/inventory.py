@@ -78,7 +78,8 @@ class Inventory:
         if item_component.equip:
             if defense:
                 if self.armor_equipped:
-                    results.append({'message': Message('You already have an armor equipped. Unequip first.')})
+                    results.append({'message': Message(
+                        'You already have an armor equipped. Unequip first.', libtcod.yellow)})
                     return results
                 else:
                     player.fighter.defense += defense
@@ -89,7 +90,8 @@ class Inventory:
 
             if attack:
                 if self.weapon_equipped:
-                    results.append({'message': Message('You already have a weapon equipped. Unequip first.')})
+                    results.append({'message': Message(
+                    'You already have a weapon equipped. Unequip first.', libtcod.yellow)})
                     return results
                 else:
                     player.fighter.power += attack
@@ -99,7 +101,7 @@ class Inventory:
                     self.weapon_equipped = True
 
             results.append({'equipped': True, 'message': Message(
-                    'You have equipped the {0}'.format(item_name))})
+                    'You have equipped the {0}'.format(item_name), libtcod.han)})
 
         return results
 
@@ -123,11 +125,11 @@ class Inventory:
             player.fighter.power -= attack
 
             self.items.append(item_entity)
-            self.equipment.append(item_entity)
+            self.equipment.remove(item_entity)
             self.weapon_equipped = False
 
 
         results.append({'equipped': True, 'message': Message(
-                'You have unequipped the {0}'.format(item_name))})
+                'You have unequipped the {0}'.format(item_name), libtcod.light_han)})
 
         return results

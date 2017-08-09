@@ -95,7 +95,7 @@ consumables = [
 leather_armor = {
     'id': 'leather_armor',
     'name':'Leather Armor (1)',
-    'char': '$',
+    'char': '(',
     'color': libtcod.darker_amber,
     'drop_chance': 60,
     'kwargs': {
@@ -108,7 +108,7 @@ leather_armor = {
 rusty_sword = {
     'id': 'rusty_sword',
     'name':'Rusty Sword [1]',
-    'char': 'S',
+    'char': '\\',
     'color': libtcod.grey,
     'drop_chance': 40,
     'kwargs': {

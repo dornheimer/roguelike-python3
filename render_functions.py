@@ -72,20 +72,20 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
                 if visible:
                     if wall:
                         # libtcod.console_set_char_background(con, x, y, colors.get('light_wall'))
-                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.darker_han, libtcod.desaturated_azure)
+                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.desaturated_han, libtcod.black)
                     else:
                         # libtcod.console_set_char_background(con, x, y, colors.get('light_ground'))
-                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.dark_grey, libtcod.darker_han)
+                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.desaturated_azure, libtcod.black)
 
                     game_map.tiles[x][y].explored = True
 
                 elif game_map.tiles[x][y].explored:
                     if wall:
                         # libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'))
-                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.darkest_grey, libtcod.darkest_azure)
+                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.darkest_han, libtcod.black)
                     else:
                         # libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'))
-                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.darker_grey, libtcod.darkest_han)
+                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.darkest_azure, libtcod.black)
 
     ### Entities
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)

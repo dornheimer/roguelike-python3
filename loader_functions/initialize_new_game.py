@@ -10,7 +10,7 @@ from render_functions import RenderOrder
 
 
 def get_constants():
-    window_title = 'spectrum_rl'
+    window_title = 'deepglow roguelike'
 
     screen_width = 80
     screen_height = 50
@@ -38,11 +38,10 @@ def get_constants():
     fov_radius = 10
 
     colors = {
-        'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150),
-        'light_wall': libtcod.Color(130, 110, 50),
-        'light_ground': libtcod.Color(200, 180, 50),
-        'selected': libtcod.Color(255, 255, 255)    # targeting
+        'dark_wall': libtcod.darkest_han, #libtcod.Color(0, 0, 100),
+        'dark_ground': libtcod.black, #libtcod.Color(50, 50, 150),
+        'light_wall': libtcod.darker_han,# (130, 110, 50),
+        'light_ground': libtcod.darkest_grey#libtcod.Color(200, 180, 50),
     }
 
     constants = {
