@@ -2,6 +2,7 @@ import libtcodpy as libtcod
 
 from components.fighter import Fighter
 from components.inventory import Inventory
+from components.level import Level
 from entity import Entity
 from game_messages import MessageLog
 from game_states import GameStates
@@ -38,10 +39,20 @@ def get_constants():
     fov_radius = 10
 
     colors = {
-        'dark_wall': libtcod.darkest_han, #libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.black, #libtcod.Color(50, 50, 150),
-        'light_wall': libtcod.darker_han,# (130, 110, 50),
-        'light_ground': libtcod.darkest_grey#libtcod.Color(200, 180, 50),
+        'dark_wall': libtcod.black,
+        'dark_wall_char': libtcod.darkest_han,
+        'dark_ground': libtcod.black,
+        'dark_ground_char': libtcod.darkest_azure,
+        'light_wall': libtcod.black,
+        'light_wall_char': libtcod.desaturated_han,
+        'light_ground': libtcod.black,
+        'light_ground_char': libtcod.desaturated_azure,
+        'text_pickup': None,
+        'text_equip': None,
+        'text_unequip': None,
+        'text_warning': None,
+        'text_target': None,
+        'text_special': None
     }
 
     constants = {
@@ -69,12 +80,14 @@ def get_constants():
 
     return constants
 
+
 def get_game_variables(constants):
         ### Entities
         fighter_component = Fighter(hp=30, defense=2, power=5)
         inventory_component = Inventory(26)
+        level_component = Level()
         player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
-                    fighter=fighter_component, inventory=inventory_component)
+                    fighter=fighter_component, inventory=inventory_component, level=level_component)
         entities = [player]
 
         ### Game map

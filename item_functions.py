@@ -19,6 +19,7 @@ def heal(*args, **kwargs):
 
     return results
 
+
 def cast_lightning(*args, **kwargs):
     """Cast a lightning bolt that automatically selects the closest target in range."""
     caster = args[0]
@@ -51,6 +52,7 @@ def cast_lightning(*args, **kwargs):
 
     return results
 
+
 def cast_fireball(*args, **kwargs):
     """Cast a targeted fireball that explodes and burns the area around the target."""
     entities = kwargs.get('entities')
@@ -76,6 +78,7 @@ def cast_fireball(*args, **kwargs):
             results.extend(entity.fighter.take_damage(damage))
 
     return results
+
 
 def cast_confuse(*args, **kwargs):
     """Confuse monster for some turns. It will move randomly and cannot attack."""
@@ -103,6 +106,7 @@ def cast_confuse(*args, **kwargs):
             break
 
     return results
+
 
 def cast_freeze(*args, **kwargs):
     """Freeze the area around the target and all enemies in it for some turns."""

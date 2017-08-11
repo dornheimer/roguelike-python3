@@ -10,7 +10,8 @@ orc = {
     'kwargs': {
         'hp': 10,
         'defense': 0,
-        'power': 3
+        'power': 3,
+        'xp': 35
         }
     }
 
@@ -23,7 +24,8 @@ troll = {
     'kwargs': {
         'hp': 16,
         'defense': 1,
-        'power': 4
+        'power': 4,
+        'xp': 100
         }
     }
 

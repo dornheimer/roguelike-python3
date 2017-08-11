@@ -1,15 +1,16 @@
 import libtcodpy as libtcod
 
-from enum import Enum
+from enum import Enum, auto
 from game_states import GameStates
-from menus import inventory_menu, equipment_menu
+from menus import character_screen, equipment_menu, inventory_menu, level_up_menu
 
 
 class RenderOrder(Enum):
     """Render order in which entities will be drawn (highest last)."""
-    CORPSE = 1
-    ITEM = 2
-    ACTOR = 3
+    STAIRS = auto()
+    CORPSE = auto()
+    ITEM = auto()
+    ACTOR = auto()
 
 
 def get_names_under_mouse(mouse, entities, fov_map):
@@ -22,6 +23,7 @@ def get_names_under_mouse(mouse, entities, fov_map):
     names = ', '.join(names)
 
     return names.capitalize()
+
 
 def show_target(cursor, mouse, key, map_width, map_height, targeting_item):
     """Show target and impact radius (when applicable)."""
@@ -42,6 +44,7 @@ def show_target(cursor, mouse, key, map_width, map_height, targeting_item):
 
     libtcod.console_blit(cursor, 0, 0, map_width, map_height, 0, 0, 0, 1.0, 0.5)
 
+
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
     """Draw health bar in bottom panel console."""
     bar_width = int(float(value) / maximum * total_width)
@@ -58,9 +61,19 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
                             libtcod.CENTER, '{0}: {1}/{2}'.format(name, value, maximum))
 
 
+def render_info(panel, x, y, name, value, color):
+    libtcod.console_set_default_foreground(panel, color)
+
+    libtcod.console_print_ex(panel, x, y, libtcod.BKGND_NONE,
+                            libtcod.LEFT, '{0}: {1}'.format(name, value))
+
+
 def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width,
                 screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state, targeting_item, key):
-    """Draw all tiles on the game (FOV) map and all entities in the list."""
+    """
+    Draw all tiles on the game (FOV) map and all entities in the list (con).
+    Render panel and targeting (cursor) consoles.
+    """
     ### Game map
     if fov_recompute:
         for y in range(game_map.height):
@@ -72,26 +85,26 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
                 if visible:
                     if wall:
                         # libtcod.console_set_char_background(con, x, y, colors.get('light_wall'))
-                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.desaturated_han, libtcod.black)
+                        libtcod.console_put_char_ex(con, x, y, '#', colors.get('light_wall_char'), colors.get('light_wall'))
                     else:
                         # libtcod.console_set_char_background(con, x, y, colors.get('light_ground'))
-                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.desaturated_azure, libtcod.black)
+                        libtcod.console_put_char_ex(con, x, y, '.', colors.get('light_ground_char'), colors.get('light_ground'))
 
                     game_map.tiles[x][y].explored = True
 
                 elif game_map.tiles[x][y].explored:
                     if wall:
                         # libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'))
-                        libtcod.console_put_char_ex(con, x, y, '#', libtcod.darkest_han, libtcod.black)
+                        libtcod.console_put_char_ex(con, x, y, '#', colors.get('dark_wall_char'), colors.get('dark_wall'))
                     else:
                         # libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'))
-                        libtcod.console_put_char_ex(con, x, y, '.', libtcod.darkest_azure, libtcod.black)
+                        libtcod.console_put_char_ex(con, x, y, '.', colors.get('dark_ground_char'), colors.get('dark_ground'))
 
     ### Entities
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
 
     for entity in entities_in_render_order:
-        draw_entity(con, entity, fov_map)
+        draw_entity(con, entity, fov_map, game_map)
 
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
@@ -113,6 +126,10 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
                 libtcod.light_red, libtcod.darker_red)
 
+    render_info(panel, 1, 2, 'Dungeon Level', game_map.dungeon_level, libtcod.light_sepia)
+    render_info(panel, 1, 3, 'Attack', player.fighter.power, libtcod.lightest_grey)
+    render_info(panel, 1, 4, 'Defense', player.fighter.defense, libtcod.lightest_grey)
+
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                             get_names_under_mouse(mouse, entities, fov_map))
@@ -130,8 +147,15 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
             inventory_title = 'Press the key next to an item to unequip it and move it back to inventory, or Esc to cancel.\n'
             equipment_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
 
-    if game_state == GameStates.TARGETING:
+    elif game_state == GameStates.LEVEL_UP:
+        level_up_menu(con, 'Level up! Choose at stat to raise:', player, 40, screen_width, screen_height)
+
+    elif game_state == GameStates.CHARACTER_SCREEN:
+        character_screen(player, 30, 10, screen_width, screen_height)
+
+    elif game_state == GameStates.TARGETING:
         show_target(cursor, mouse, key, game_map.width, game_map.height, targeting_item)
+
 
 def clear_all(con, entities):
     """Erase characters of all entities."""
@@ -139,9 +163,9 @@ def clear_all(con, entities):
         clear_entity(con, entity)
 
 
-def draw_entity(con, entity, fov_map):
+def draw_entity(con, entity, fov_map, game_map):
     """Draw entity if it is in FOV."""
-    if libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
+    if libtcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
         libtcod.console_set_default_foreground(con, entity.color)
         libtcod.console_put_char(con, entity.x, entity.y, entity.char, libtcod.BKGND_NONE)
 

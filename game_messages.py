@@ -27,4 +27,3 @@ class MessageLog:
 
             # Add the new line as a Message object, with the text and color
             self.messages.append(Message(line, message.color))
-            

@@ -11,7 +11,9 @@ class Inventory:
         self.armor_equipped = False
         self.weapon_equipped = False
 
+
     def add_item(self, item):
+        """Add item from ground to inventory."""
         results = []
 
         if len(self.items) >= self.capacity:
@@ -29,7 +31,9 @@ class Inventory:
 
         return results
 
+
     def use(self, item_entity, **kwargs):
+        """Use item from inventory."""
         results = []
 
         item_component = item_entity.item
@@ -51,10 +55,14 @@ class Inventory:
 
         return results
 
+
     def remove_item(self, item):
+        "Remove item from the inventory list."
         self.items.remove(item)
 
+
     def drop_item(self, item):
+        """Drop item from inventory on the ground."""
         results = []
 
         item.x = self.owner.x
@@ -66,7 +74,9 @@ class Inventory:
 
         return results
 
+
     def equip(self, item_entity, player):
+        """Equip item from inventory."""
         results = []
 
         item_component = item_entity.item
@@ -88,7 +98,7 @@ class Inventory:
                     self.equipment.append(item_entity)
                     self.armor_equipped = True
 
-            if attack:
+            elif attack:
                 if self.weapon_equipped:
                     results.append({'message': Message(
                     'You already have a weapon equipped. Unequip first.', libtcod.yellow)})
@@ -105,7 +115,9 @@ class Inventory:
 
         return results
 
+
     def unequip(self, item_entity, player):
+        """Unequip item from equipment menu and move it back to inventory."""
         results = []
 
         item_component = item_entity.item
