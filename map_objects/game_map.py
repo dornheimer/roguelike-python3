@@ -6,18 +6,18 @@ from components.fighter import Fighter
 from components.item import Item
 from entity import Entity
 from game_messages import Message
-from map_objects.items import consumables, equipment
-from map_objects.monsters import monsters
+from map_objects.items import consumables, equipment, max_items_dungeon
+from map_objects.monsters import max_monsters_dungeon, monsters
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
 from map_objects.stairs import Stairs
-from random_utils import random_choice_from_dict
+from random_utils import from_dungeon_level, random_choice_from_dict
 from render_functions import RenderOrder
 
 
 class GameMap:
     """
-    Contains methods for initializing tiles and creating rooms.
+    Contains methods for initializing tiles and creating rooms with monsters and items.
     """
     def __init__(self, width, height, dungeon_level=1):
         self.width = width
@@ -33,8 +33,7 @@ class GameMap:
         return tiles
 
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width,
-                    map_height, player, entities, max_monsters_per_room, max_items_per_room):
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities):
         """Carve randomly generated rooms out of the game map."""
         rooms = []
         num_rooms = 0
@@ -91,7 +90,7 @@ class GameMap:
                         self.create_h_tunnel(prev_x, new_x, prev_y)
 
                 # put entities into room
-                self.place_entities(new_room, entities, max_monsters_per_room, max_items_per_room)
+                self.place_entities(new_room, entities)
 
                 # finally, append the new room to the list
                 rooms.append(new_room)
@@ -125,15 +124,18 @@ class GameMap:
             self.tiles[x][y].block_sight = False
 
 
-    def place_entities(self, room, entities, max_monsters_per_room, max_items_per_room):
+    def place_entities(self, room, entities):
         """Place a random number of monsters in each room of the map."""
+        max_monsters_per_room = from_dungeon_level(max_monsters_dungeon, self.dungeon_level)
+        max_items_per_room = from_dungeon_level(max_items_dungeon, self.dungeon_level)
         # Get a random number of monsters and items
         number_of_monsters = randint(0, max_monsters_per_room)
         number_of_items = randint(0, max_items_per_room)
 
-        monster_chances = {m['id']: m['spawn_chance'] for m in monsters}
-        consumables_chances = {c['id']: c['drop_chance'] for c in consumables}
-        equipment_chances = {e['id']: e['drop_chance'] for e in equipment}
+        # Generate dictionary (elem -> chance ) for the appropriate dungeon level
+        monster_chances = {m['id']: from_dungeon_level(m['spawn_chance'], self.dungeon_level) for m in monsters}
+        consumables_chances = {c['id']: from_dungeon_level(c['drop_chance'], self.dungeon_level) for c in consumables}
+        equipment_chances = {e['id']: from_dungeon_level(e['drop_chance'], self.dungeon_level) for e in equipment}
 
         ### Monsters
         for i in range(number_of_monsters):
@@ -203,8 +205,7 @@ class GameMap:
 
         self.tiles = self.initialize_tiles()
         self.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                        constants['map_width'], constants['map_height'], player, entities,
-                        constants['max_monsters_per_room'], constants['max_items_per_room'])
+                        constants['map_width'], constants['map_height'], player, entities)
 
         player.fighter.heal(player.fighter.max_hp // 2)
 
