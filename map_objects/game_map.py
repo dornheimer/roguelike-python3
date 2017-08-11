@@ -23,6 +23,7 @@ class GameMap:
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
+        self.dungeon_level = dungeon_level
 
 
     def initialize_tiles(self):
