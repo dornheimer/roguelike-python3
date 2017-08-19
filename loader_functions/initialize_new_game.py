@@ -1,5 +1,7 @@
 import libtcodpy as libtcod
 
+from components.equipment import Equipment
+from components.equippable import Equippable
 from components.fighter import Fighter
 from components.inventory import Inventory
 from components.level import Level
@@ -7,6 +9,7 @@ from entity import Entity
 from game_messages import MessageLog
 from game_states import GameStates
 from map_objects.game_map import GameMap
+from map_objects.items import dagger
 from render_functions import RenderOrder
 
 
@@ -78,12 +81,20 @@ def get_constants():
 
 def get_game_variables(constants):
         ### Entities
-        fighter_component = Fighter(hp=100, defense=1, power=4)
+        fighter_component = Fighter(hp=100, defense=1, power=3)
         inventory_component = Inventory(26)
         level_component = Level()
-        player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
-                    fighter=fighter_component, inventory=inventory_component, level=level_component)
+        equipment_component = Equipment()
+        player = Entity(0, 0, '@', libtcod.lightest_grey, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
+                    fighter=fighter_component, inventory=inventory_component, level=level_component, equipment=equipment_component, description='You.')
         entities = [player]
+
+        equippable_component = Equippable(**dagger['kwargs'])
+        char, color, name = dagger['entity_args']
+        starting_weapon = Entity(0, 0, char, color, name, render_order=RenderOrder.ITEM, equippable=equippable_component, description=dagger['description'])
+
+        player.inventory.add_item(starting_weapon)
+        player.equipment.toggle_equip(starting_weapon)
 
         ### Game map
         game_map = GameMap(constants['map_width'], constants['map_height'])

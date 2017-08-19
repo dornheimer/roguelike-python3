@@ -7,9 +7,6 @@ class Inventory:
     def __init__(self, capacity):
         self.capacity = capacity
         self.items = []
-        self.equipment = []
-        self.armor_equipped = False
-        self.weapon_equipped = False
 
 
     def add_item(self, item):
@@ -39,7 +36,12 @@ class Inventory:
         item_component = item_entity.item
 
         if item_component.use_function is None:
-            results.append({'message': Message('The {0} cannot be used'.format(item_entity))})
+            equippable_component = item_entity.equippable
+
+            if equippable_component:
+                results.append({'equip': item_entity})
+            else:
+                results.append({'message': Message('The {0} cannot be used'.format(item_entity))})
         else:
             if item_component.targeting and not (kwargs.get('target_x') or kwargs.get('target_y')):
                 results.append({'targeting': item_entity})
@@ -65,83 +67,16 @@ class Inventory:
         """Drop item from inventory on the ground."""
         results = []
 
+        equipment = self.owner.equipment
+
+        if item in {equipment.main_hand, equipment.off_hand}:
+            equipment.toggle_equip(item)
+
         item.x = self.owner.x
         item.y = self.owner.y
 
         self.remove_item(item)
         results.append({'item_dropped': item, 'message': Message('You dropped the {0}'.format(item.name),
                                                                 libtcod.yellow)})
-
-        return results
-
-
-    def equip(self, item_entity, player):
-        """Equip item from inventory."""
-        results = []
-
-        item_component = item_entity.item
-
-        attack = item_component.function_kwargs.get('attack')
-        defense = item_component.function_kwargs.get('defense')
-        item_name = item_component.function_kwargs.get('item_name')
-
-        if item_component.equip:
-            if defense:
-                if self.armor_equipped:
-                    results.append({'message': Message(
-                        'You already have an armor equipped. Unequip first.', libtcod.yellow)})
-                    return results
-                else:
-                    player.fighter.defense += defense
-
-                    self.remove_item(item_entity)
-                    self.equipment.append(item_entity)
-                    self.armor_equipped = True
-
-            elif attack:
-                if self.weapon_equipped:
-                    results.append({'message': Message(
-                    'You already have a weapon equipped. Unequip first.', libtcod.yellow)})
-                    return results
-                else:
-                    player.fighter.power += attack
-
-                    self.remove_item(item_entity)
-                    self.equipment.append(item_entity)
-                    self.weapon_equipped = True
-
-            results.append({'equipped': True, 'message': Message(
-                    'You have equipped the {0}'.format(item_name), libtcod.han)})
-
-        return results
-
-
-    def unequip(self, item_entity, player):
-        """Unequip item from equipment menu and move it back to inventory."""
-        results = []
-
-        item_component = item_entity.item
-
-        attack = item_component.function_kwargs.get('attack')
-        defense = item_component.function_kwargs.get('defense')
-        item_name = item_component.function_kwargs.get('item_name')
-
-        if defense and self.armor_equipped:
-            player.fighter.defense -= defense
-
-            self.items.append(item_entity)
-            self.equipment.remove(item_entity)
-            self.armor_equipped = False
-
-        elif attack and self.weapon_equipped:
-            player.fighter.power -= attack
-
-            self.items.append(item_entity)
-            self.equipment.remove(item_entity)
-            self.weapon_equipped = False
-
-
-        results.append({'equipped': True, 'message': Message(
-                'You have unequipped the {0}'.format(item_name), libtcod.light_han)})
 
         return results

@@ -2,7 +2,10 @@ import libtcodpy as libtcod
 from random import randint
 
 from components.ai import BasicMonster
+from components.equipment import Equipment, EquipmentSlots
+from components.equippable import Equippable
 from components.fighter import Fighter
+from components.inventory import Inventory
 from components.item import Item
 from entity import Entity
 from game_messages import Message
@@ -97,7 +100,7 @@ class GameMap:
                 num_rooms += 1
 
         stairs_component = Stairs(self.dungeon_level + 1)
-        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, '>', libtcod.white, 'Stairs',
+        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, '>', libtcod.lightest_grey, 'Stairs',
                              render_order=RenderOrder.STAIRS, stairs=stairs_component)
         entities.append(down_stairs)
 
@@ -150,10 +153,16 @@ class GameMap:
                     if monster_choice == monster['id']:
                         fighter_component = Fighter(**monster['kwargs'])
                         ai_component = BasicMonster()
-                        char, color, name = monster['char'], monster['color'], monster['name']
+                        inventory_component = Inventory(10)
+                        equipment_component = Equipment()
+                        char, color, name = monster['entity_args']
 
                         creature = Entity(x, y, char, color, name, blocks=True,
-                                        render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                                        render_order=RenderOrder.ACTOR, fighter=fighter_component,
+                                        ai=ai_component, inventory=inventory_component, equipment=equipment_component, description=monster['description'])
+
+                        # creature.inventory.equipment.extend([equipment[0], equipment[1]])
+                        # creature.inventory.update_equipment(creature)
 
                 entities.append(creature)
 
@@ -165,27 +174,27 @@ class GameMap:
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 select_item_pool = randint(0, 100)
 
-                if select_item_pool < 80:
+                if select_item_pool < 70:
                     item_choice = random_choice_from_dict(consumables_chances)
 
                     for consumable in consumables:
                         if item_choice == consumable['id']:
                             item_component = Item(**consumable['kwargs'])
-                            char, color, name = consumable['char'], consumable['color'], consumable['name']
+                            char, color, name = consumable['entity_args']
 
                             item = Entity(x, y, char, color, name, render_order=RenderOrder.ITEM,
-                                        item=item_component)
+                                        item=item_component, description=consumable['description'])
 
                 else:
                     item_choice = random_choice_from_dict(equipment_chances)
 
-                    for equipable in equipment:
-                        if item_choice == equipable['id']:
-                            item_component = Item(**equipable['kwargs'])
-                            char, color, name = equipable['char'], equipable['color'], equipable['name']
+                    for equippable in equipment:
+                        if item_choice == equippable['id']:
+                            equippable_component = Equippable(**equippable['kwargs'])
+                            char, color, name = equippable['entity_args']
 
                             item = Entity(x, y, char, color, name, render_order=RenderOrder.ITEM,
-                                        item=item_component)
+                                        equippable=equippable_component, description=equippable['description'])
 
                 entities.append(item)
 

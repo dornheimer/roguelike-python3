@@ -13,6 +13,7 @@ from loader_functions.data_loaders import load_game, save_game
 from menus import main_menu, message_box
 from render_functions import clear_all, render_all
 
+
 def play_game(player, entities, game_map, message_log, game_state, con, panel, cursor, constants):
     fov_recompute = True
     fov_map = initialize_fov(game_map)
@@ -119,15 +120,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 item = player.inventory.items[inventory_index]
 
                 if game_state == GameStates.SHOW_INVENTORY:
-                    if item.item.equip:
-                        player_turn_results.extend((player.inventory.equip(item, player)))
-                    else:
-                        player_turn_results.extend((player.inventory.use(item, entities=entities, fov_map=fov_map)))
+                    player_turn_results.extend((player.inventory.use(item, entities=entities, fov_map=fov_map)))
 
                 elif game_state == GameStates.SHOW_EQUIPMENT:
-                    if inventory_index < len(player.inventory.equipment):
-                        item = player.inventory.equipment[inventory_index]
-                        player_turn_results.extend((player.inventory.unequip(item, player)))
+                        item = player.equipment.equipped[inventory_index]
+                        player_turn_results.extend((player.inventory.use(item, entities=entities, fov_map=fov_map)))
 
                 elif game_state == GameStates.DROP_INVENTORY:
                     player_turn_results.extend((player.inventory.drop_item(item)))
@@ -145,12 +142,12 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         if level_up:
             if level_up == 'hp':
-                player.fighter.max_hp += 20
+                player.fighter.base_max_hp += 20
                 player.fighter.hp += 20
             elif level_up == 'str':
-                player.fighter.power += 1
+                player.fighter.base_power += 1
             elif level_up == 'def':
-                player.fighter.defense += 1
+                player.fighter.base_defense += 1
 
             game_state = previous_game_state
 
@@ -196,8 +193,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             dead_entity = player_turn_result.get('dead')
             item_added = player_turn_result.get('item_added')
             item_consumed = player_turn_result.get('consumed')
-            item_equipped = player_turn_result.get('equipped')
             item_dropped = player_turn_result.get('item_dropped')
+            equip = player_turn_result.get('equip')
             targeting = player_turn_result.get('targeting')
             targeting_cancelled = player_turn_result.get('targeting_cancelled')
             xp = player_turn_result.get('xp')
@@ -227,7 +224,19 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             if item_consumed:
                 game_state = GameStates.ENEMY_TURN
 
-            if item_equipped:
+            if equip:
+                equip_results = player.equipment.toggle_equip(equip)
+
+                for equip_result in equip_results:
+                    equipped = equip_result.get('equipped')
+                    dequipped = equip_result.get('dequipped')
+
+                    if equipped:
+                        message_log.add_message(Message('You equipped the {0}'.format(equipped.name)))
+
+                    if dequipped:
+                        message_log.add_message(Message('You dequipped the {0}'.format(dequipped.name)))
+
                 game_state = GameStates.ENEMY_TURN
 
             if targeting:

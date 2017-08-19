@@ -4,7 +4,7 @@ import textwrap
 
 
 class Message:
-    def __init__(self, text, color=libtcod.white):
+    def __init__(self, text, color=libtcod.lightest_grey):
         self.text = text
         self.color = color
 

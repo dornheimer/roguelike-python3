@@ -1,6 +1,7 @@
 import libtcodpy as libtcod
 import math
 
+from components.item import Item
 from render_functions import RenderOrder
 
 
@@ -9,7 +10,7 @@ class Entity:
     A generic object to represent the player, enemies, items, etc.
     """
     def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE,
-                    fighter=None, ai=None, item=None, inventory=None, stairs=None, level=None):
+                    fighter=None, ai=None, item=None, inventory=None, stairs=None, level=None, equipment=None, equippable=None, description=None):
         self.x = x
         self.y = y
         self.char = char
@@ -23,6 +24,9 @@ class Entity:
         self.inventory = inventory
         self.stairs = stairs
         self.level = level
+        self.equipment = equipment
+        self.equippable = equippable
+        self.description = description
 
         # Components are owned by the entity
         if self.fighter:
@@ -42,6 +46,17 @@ class Entity:
 
         if self.level:
             self.level.owner = self
+
+        if self.equipment:
+            self.equipment.owner = self
+
+        if self.equippable:
+            self.equippable.owner = self
+
+            if not self.item:
+                item = Item()
+                self.item = item
+                self.item.owner = self
 
     def move(self, dx, dy):
         """Move entity by a given amount"""
@@ -116,6 +131,9 @@ class Entity:
         dx = other.x - self.x
         dy = other.y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
+
+    def __repr__(self):
+        return self.name
 
 
 def get_blocking_entities_at_location(entities, destination_x, destination_y):

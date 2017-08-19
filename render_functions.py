@@ -2,7 +2,7 @@ import libtcodpy as libtcod
 
 from enum import Enum, auto
 from game_states import GameStates
-from menus import character_screen, equipment_menu, inventory_menu, level_up_menu
+from menus import character_screen, equipment_menu, inventory_menu, level_up_menu, description_box
 
 
 class RenderOrder(Enum):
@@ -25,6 +25,27 @@ def get_names_under_mouse(mouse, entities, fov_map):
     return names.capitalize()
 
 
+def get_entity_information_under_mouse(mouse, entities, fov_map):
+    """Return description of monster if mouse is on top."""
+    (x, y) = (mouse.cx, mouse.cy)
+
+    description = [entity.description for entity in entities
+                if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
+
+    description = ', '.join(description)
+
+    # for entity in entities:
+    #     print(entity.inventory)
+    #     if entity.inventory:
+    #         equipment = [entity.inventory.equipment for entity in entities
+    #             if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
+    #
+    # if equipment:
+    #     equipment = ', '.join([e['name'] for e in equipment[0]])
+
+    return description#, equipment
+
+
 def show_target(cursor, mouse, key, map_width, map_height, targeting_item):
     """Show target and impact radius (when applicable)."""
     (x, y) = (mouse.cx, mouse.cy)
@@ -40,7 +61,7 @@ def show_target(cursor, mouse, key, map_width, map_height, targeting_item):
             for b in range(y - radius, y + radius + 1):
                 libtcod.console_set_char_background(cursor, a, b, targeting_item.color)
     else:
-        libtcod.console_set_char_background(cursor, x, y, libtcod.white)
+        libtcod.console_set_char_background(cursor, x, y, libtcod.lightest_grey)
 
     libtcod.console_blit(cursor, 0, 0, map_width, map_height, 0, 0, 0, 1.0, 0.5)
 
@@ -56,7 +77,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     if bar_width > 0:
         libtcod.console_rect(panel, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
 
-    libtcod.console_set_default_foreground(panel, libtcod.white)
+    libtcod.console_set_default_foreground(panel, libtcod.lightest_grey)
     libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE,
                             libtcod.CENTER, '{0}: {1}/{2}'.format(name, value, maximum))
 
@@ -133,19 +154,20 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                             get_names_under_mouse(mouse, entities, fov_map))
+    description_box(con, get_entity_information_under_mouse(mouse, entities, fov_map), 10, screen_width, screen_height, mouse.cx, mouse.cy)
 
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
     if game_state in {GameStates.SHOW_INVENTORY, GameStates.SHOW_EQUIPMENT, GameStates.DROP_INVENTORY}:
         if game_state == GameStates.SHOW_INVENTORY:
             inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
-            inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+            inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
         elif game_state == GameStates.DROP_INVENTORY:
             inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
-            inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+            inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
         else:
-            inventory_title = 'Press the key next to an item to unequip it and move it back to inventory, or Esc to cancel.\n'
-            equipment_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+            inventory_title = 'Press the key next to an item to unequip it, or Esc to cancel.\n'
+            equipment_menu(con, inventory_title, player, 30, screen_width, screen_height)
 
     elif game_state == GameStates.LEVEL_UP:
         level_up_menu(con, 'Level up! Choose at stat to raise:', player, 40, screen_width, screen_height)

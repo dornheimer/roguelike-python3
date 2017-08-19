@@ -1,5 +1,6 @@
 import libtcodpy as libtcod
 
+from map_objects.items import consumables, equipment
 
 # maximum number of monsters per room [num, dungeon_level]
 max_monsters_dungeon = [[2, 1], [3, 4], [5, 6]]
@@ -7,23 +8,24 @@ max_monsters_dungeon = [[2, 1], [3, 4], [5, 6]]
 ### BASIC AI MONSTERS ###
 orc = {
     'id': 'orc',
-    'name':'Orc',
-    'char': 'o',
-    'color': libtcod.desaturated_green,
+    'entity_args': ('o', libtcod.desaturated_green, 'Orc'),
+    'description':
+        """This creature wields a sword and wears light armor.""",
+    #'equipment': equipment,
     'spawn_chance': [[80, 1]],
     'kwargs': {
         'hp': 20,
         'defense': 0,
-        'power': 4,
+        'power': 3,
         'xp': 35
         }
     }
 
 troll = {
     'id': 'troll',
-    'name':'Troll',
-    'char': 'T',
-    'color': libtcod.darker_green,
+    'entity_args': ('T', libtcod.darker_green, 'Troll'),
+    'description':
+        """This creature wields a heavy club and is protected my its thick skin.""",
     'spawn_chance':
         [[15, 3], [30, 5], [60, 7]],
     'kwargs': {
