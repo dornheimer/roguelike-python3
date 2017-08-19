@@ -14,13 +14,13 @@ class Equippable:
     def __str__(self):
         boni = []
         if self.power_bonus:
-            power = 'a:%s' % self.power_bonus
+            power = 'a%s' % self.power_bonus
             boni.append(power)
         if self.defense_bonus:
-            defense = 'd:%s' % self.defense_bonus
+            defense = 'd%s' % self.defense_bonus
             boni.append(defense)
         if self.max_hp_bonus:
-            max_hp = 'hp:%s' % self.max_hp_bonus
+            max_hp = 'hp%s' % self.max_hp_bonus
             boni.append(max_hp)
 
         return " ".join(boni)

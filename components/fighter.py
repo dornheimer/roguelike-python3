@@ -52,12 +52,14 @@ class Fighter:
 
         return results
 
+
     def heal(self, amount):
         """Heal by some amount."""
         self.hp += amount
 
         if self.hp > self.max_hp:
             self.hp = self.max_hp
+
 
     def attack(self, target):
         """Calculate damage and return combat message."""
@@ -66,7 +68,6 @@ class Fighter:
         damage = self.power - target.fighter.defense
 
         libtcod.console_set_color_control(libtcod.COLCTRL_4, libtcod.red, libtcod.black)
-
 
         if damage > 0:
             results.append({'message': Message('{0} attacks {1} for {2} hit points.'.format(

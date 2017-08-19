@@ -137,8 +137,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     libtcod.console_clear(con)
 
                     break
-                else:
-                    message_log.add_message(Message('There are no stairs here.', libtcod.yellow))
+            else:
+                message_log.add_message(Message('There are no stairs here.', libtcod.yellow))
 
         if level_up:
             if level_up == 'hp':

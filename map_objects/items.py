@@ -165,7 +165,7 @@ dagger = {
     'entity_args': ('-', libtcod.dark_sky, 'Dagger'),
     'description':
         """A small (and dull) dagger.""",
-    'drop_chance': [[60, 1]],
+    'drop_chance': [[40, 1]],
     'kwargs': {
         'slot': EquipmentSlots.MAIN_HAND,
         'power_bonus': 1
@@ -177,10 +177,10 @@ rusty_sword = {
     'entity_args': ('/', libtcod.light_grey, 'Rusty Sword'),
     'description':
         """A rusty sword.""",
-    'drop_chance': [[60, 1]],
+    'drop_chance': [[20, 1]],
     'kwargs': {
         'slot': EquipmentSlots.MAIN_HAND,
-        'power_bonus': 3
+        'power_bonus': 2
         }
     }
 
@@ -189,8 +189,8 @@ health_amulet = {
     'id': 'health_amulet',
     'entity_args': ('§', libtcod.light_magenta, 'Health Amulet'),
     'description':
-        """An amulet with a sparkling gem.""",
-    'drop_chance': [[20, 1]],
+        """An (magic?) amulet with a sparkling gem.""",
+    'drop_chance': [[30, 1]],
     'kwargs': {
         'slot': EquipmentSlots.SPECIAL,
         'max_hp_bonus': 10

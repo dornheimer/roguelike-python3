@@ -1,0 +1,10 @@
++ freeze scroll (and frozen enemy 'behavior')
++ more equipment slots (and new equippable items)
++ equipment menu (with item stats)
++ target highlighting (single + radius), radius not 100% accurate
++ ui tweaks (colored text, changed font file)
++ added (very basic) description to all entities (shows up when mouse is moved over entity)
++ new menu background (source image by christopher balaskas)
+
+[+ made toggle_equip function dynamic (now loops over every equipment slot automatically)]
+[+ moved item and monster parameters to seperate files]
