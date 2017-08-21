@@ -6,7 +6,8 @@ from render_functions import RenderOrder
 
 
 def kill_player(player):
-    """Player death.
+    """Handle player death.
+
     Change game state to PLAYER_DEAD and replace player with corpse.
     """
     player.char = '%'
@@ -16,7 +17,8 @@ def kill_player(player):
 
 
 def kill_monster(monster):
-    """Monster death.
+    """Handle monster death.
+
     Replace monster with corpse and reset its attributes.
     """
     death_message = Message('{0} is dead!'.format(monster.name.capitalize()), libtcod.orange)

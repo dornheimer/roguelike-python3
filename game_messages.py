@@ -4,12 +4,16 @@ import textwrap
 
 
 class Message:
+    """Class for basic text message with a color."""
+
     def __init__(self, text, color=libtcod.lightest_grey):
         self.text = text
         self.color = color
 
 
 class MessageLog:
+    """Message log with a buffer."""
+
     def __init__(self, x, width, height):
         self.messages = []
         self.x = x
@@ -17,6 +21,11 @@ class MessageLog:
         self.height = height
 
     def add_message(self, message):
+        """
+        Add message to log.
+
+        Wraps messages to width and deletes lines when buffer is full.
+        """
         # Split the message if necessary, among multiple lines
         new_msg_lines = textwrap.wrap(message.text, self.width)
 

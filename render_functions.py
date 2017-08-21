@@ -7,6 +7,7 @@ from menus import character_screen, equipment_menu, inventory_menu, level_up_men
 
 class RenderOrder(Enum):
     """Render order in which entities will be drawn (highest last)."""
+
     STAIRS = auto()
     CORPSE = auto()
     ITEM = auto()
@@ -26,24 +27,28 @@ def get_names_under_mouse(mouse, entities, fov_map):
 
 
 def get_entity_information_under_mouse(mouse, entities, fov_map):
-    """Return description of monster if mouse is on top."""
+    """
+    Return description of entity if mouse is on top.
+    When applicable, show equipped items.
+    """
     (x, y) = (mouse.cx, mouse.cy)
 
-    description = [entity.description for entity in entities
-                if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
+    under_mouse = [entity for entity in entities
+                    if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
 
-    description = ', '.join(description)
+    description = [entity.description for entity in under_mouse if entity.description]
 
-    # for entity in entities:
-    #     print(entity.inventory)
-    #     if entity.inventory:
-    #         equipment = [entity.inventory.equipment for entity in entities
-    #             if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
-    #
-    # if equipment:
-    #     equipment = ', '.join([e['name'] for e in equipment[0]])
+    equipment = []
+    for entity in under_mouse:
+        if entity.equipment:
+            equipment.extend(entity.equipment.equipped)
 
-    return description#, equipment
+    information = ', '.join(description)
+
+    if equipment:
+        information += "\nEquipment:" + ', '.join([item.name for item in equipment])
+
+    return information
 
 
 def show_target(cursor, mouse, key, map_width, map_height, targeting_item):
@@ -79,14 +84,14 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
     libtcod.console_set_default_foreground(panel, libtcod.lightest_grey)
     libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE,
-                            libtcod.CENTER, '{0}: {1}/{2}'.format(name, value, maximum))
+                                libtcod.CENTER, '{0}: {1}/{2}'.format(name, value, maximum))
 
 
 def render_info(panel, x, y, name, value, color):
     libtcod.console_set_default_foreground(panel, color)
 
     libtcod.console_print_ex(panel, x, y, libtcod.BKGND_NONE,
-                            libtcod.LEFT, '{0}: {1}'.format(name, value))
+                                libtcod.LEFT, '{0}: {1}'.format(name, value))
 
 
 def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width,
@@ -143,9 +148,8 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
         libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
         y += 1
 
-
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
-                libtcod.light_red, libtcod.darker_red)
+                libtcod.darker_crimson, libtcod.darker_red)
 
     render_info(panel, 1, 2, 'Dungeon Level', game_map.dungeon_level, libtcod.light_sepia)
     render_info(panel, 1, 3, 'Attack', player.fighter.power, libtcod.lightest_grey)
@@ -153,8 +157,9 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
 
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
-                            get_names_under_mouse(mouse, entities, fov_map))
-    description_box(con, get_entity_information_under_mouse(mouse, entities, fov_map), 10, screen_width, screen_height, mouse.cx, mouse.cy)
+                                get_names_under_mouse(mouse, entities, fov_map))
+    description_box(con, get_entity_information_under_mouse(mouse, entities, fov_map),
+                        10, screen_width, screen_height, mouse.cx, mouse.cy)
 
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
@@ -193,7 +198,5 @@ def draw_entity(con, entity, fov_map, game_map):
 
 
 def clear_entity(con, entity):
-    """Erase the character that represents this object
-    (prevents leaving a trail).
-    """
+    """Erase the character that represents this object (prevents leaving a trail)."""
     libtcod.console_put_char(con, entity.x, entity.y, ' ', libtcod.BKGND_NONE)

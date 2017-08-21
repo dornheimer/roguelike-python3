@@ -172,6 +172,18 @@ dagger = {
         }
     }
 
+club = {
+    'id': 'club',
+    'entity_args': ('?', libtcod.dark_lime, 'Club'),
+    'description':
+        """A heavy club made of wood.""",
+    'drop_chance': [[20, 3]],
+    'kwargs': {
+        'slot': EquipmentSlots.MAIN_HAND,
+        'power_bonus': 3
+        }
+    }
+
 rusty_sword = {
     'id': 'rusty_sword',
     'entity_args': ('/', libtcod.light_grey, 'Rusty Sword'),

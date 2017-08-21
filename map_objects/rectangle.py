@@ -1,5 +1,6 @@
 class Rect:
     """Rectangle specified by x, y coordinates and side lengths (w, h)."""
+
     def __init__(self, x, y, w, h):
         self.x1 = x
         self.y1 = y

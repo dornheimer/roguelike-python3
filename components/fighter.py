@@ -2,10 +2,10 @@ import libtcodpy as libtcod
 
 from game_messages import Message
 
+
 class Fighter:
-    """
-    Fighter compomenent for entities.
-    """
+    """Fighter compomenent for entities."""
+
     def __init__(self, hp, defense, power, xp=0):
         self.base_max_hp = hp
         self.hp = hp
@@ -15,6 +15,7 @@ class Fighter:
 
     @property
     def max_hp(self):
+        """Apply bonus to base maximum hp."""
         if self.owner and self.owner.equipment:
             bonus = self.owner.equipment.max_hp_bonus
         else:
@@ -24,6 +25,7 @@ class Fighter:
 
     @property
     def power(self):
+        """Apply bonus to base power."""
         if self.owner and self.owner.equipment:
             bonus = self.owner.equipment.power_bonus
         else:
@@ -33,13 +35,13 @@ class Fighter:
 
     @property
     def defense(self):
+        """Apply bonus to base defense."""
         if self.owner and self.owner.equipment:
             bonus = self.owner.equipment.defense_bonus
         else:
             bonus = 0
 
         return self.base_defense + bonus
-
 
     def take_damage(self, amount):
         """Subtract damage from Fighter hp and return 'dead' if hp <= 0."""
@@ -52,14 +54,12 @@ class Fighter:
 
         return results
 
-
     def heal(self, amount):
         """Heal by some amount."""
         self.hp += amount
 
         if self.hp > self.max_hp:
             self.hp = self.max_hp
-
 
     def attack(self, target):
         """Calculate damage and return combat message."""

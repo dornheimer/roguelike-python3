@@ -128,10 +128,11 @@ def character_screen(player, character_screen_width, character_screen_height, sc
 
     libtcod.console_set_default_foreground(window, libtcod.lightest_grey)
     libtcod.console_set_color_control(libtcod.COLCTRL_1, libtcod.dark_magenta, libtcod.black)
+    libtcod.console_set_color_control(libtcod.COLCTRL_2, libtcod.lighter_sepia, libtcod.black)
 
-
+    heading = f'%cCharacter Information%c' % (libtcod.COLCTRL_2, libtcod.COLCTRL_STOP)
     libtcod.console_print_rect_ex(window, 0, 1, character_screen_width, character_screen_height, libtcod.BKGND_NONE,
-                                    libtcod.LEFT, 'Character Information')
+                                    libtcod.LEFT, heading)
 
     player_level = f'Level: %c{player.level.current_level}%c' % (libtcod.COLCTRL_1, libtcod.COLCTRL_STOP)
     libtcod.console_print_rect_ex(window, 0, 2, character_screen_width, character_screen_height, libtcod.BKGND_NONE,

@@ -3,6 +3,7 @@ from equipment_slots import EquipmentSlots
 
 class Equipment:
     """Component class for equipment slots and the boni that their items provide."""
+
     def __init__(self, main_hand=None, off_hand=None, torso=None, head=None,
                     coat=None, ring_l=None, ring_r=None, special=None):
         self.main_hand = main_hand
@@ -14,12 +15,10 @@ class Equipment:
         self.ring_r = ring_r
         self.special = special
 
-
     @property
     def equipped(self):
         """List with all currently equipped items."""
         return [value for key, value in vars(self).items() if value and key != 'owner']
-
 
     @property
     def max_hp_bonus(self):
@@ -31,7 +30,6 @@ class Equipment:
 
         return bonus
 
-
     @property
     def power_bonus(self):
         """Calculate bonus to power from all equipped items."""
@@ -42,7 +40,6 @@ class Equipment:
 
         return bonus
 
-
     @property
     def defense_bonus(self):
         """Calculate bonus to defense from all equipped items."""
@@ -52,7 +49,6 @@ class Equipment:
             bonus += item.equippable.defense_bonus
 
         return bonus
-
 
     def toggle_equip(self, equippable_entity):
         """Equip / unequip item to the corresponding equipment slot."""

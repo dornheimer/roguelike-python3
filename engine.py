@@ -61,7 +61,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         take_stairs = action.get('take_stairs')
         level_up = action.get('level_up')
         show_character_screen = action.get('show_character_screen')
-        select_target = action.get('select_target')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
@@ -116,7 +115,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             game_state = GameStates.DROP_INVENTORY
 
         if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD \
-                    and inventory_index < len(player.inventory.items):
+                and inventory_index < len(player.inventory.items):
                 item = player.inventory.items[inventory_index]
 
                 if game_state == GameStates.SHOW_INVENTORY:
@@ -185,7 +184,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 return True
 
         if fullscreen:
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen()) # toggle on/off
+            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())  # toggle on/off
 
         # At the end of the player's turn, evaluate results and print messages to log
         for player_turn_result in player_turn_results:
@@ -297,6 +296,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
 def main():
     """Main loop.
+
     TO DO
     """
     constants = get_constants()

@@ -9,7 +9,7 @@ from components.inventory import Inventory
 from components.item import Item
 from entity import Entity
 from game_messages import Message
-from map_objects.items import consumables, equipment, max_items_dungeon
+from map_objects.items import consumables, equipment, max_items_dungeon, dagger, robes
 from map_objects.monsters import max_monsters_dungeon, monsters
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
@@ -19,22 +19,19 @@ from render_functions import RenderOrder
 
 
 class GameMap:
-    """
-    Contains methods for initializing tiles and creating rooms with monsters and items.
-    """
+    """Contains methods for initializing tiles and creating rooms with monsters and items."""
+
     def __init__(self, width, height, dungeon_level=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
         self.dungeon_level = dungeon_level
 
-
     def initialize_tiles(self):
         """Fill game map with blocked tiles."""
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
 
         return tiles
-
 
     def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities):
         """Carve randomly generated rooms out of the game map."""
@@ -104,7 +101,6 @@ class GameMap:
                              render_order=RenderOrder.STAIRS, stairs=stairs_component)
         entities.append(down_stairs)
 
-
     def create_room(self, room):
         """Go through the tiles in the rectangle and make them passable."""
         for x in range(room.x1 + 1, room.x2):
@@ -112,13 +108,11 @@ class GameMap:
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
 
-
     def create_h_tunnel(self, x1, x2, y):
         """Create a horizontal tunnel."""
         for x in range(min(x1, x2), max(x1, x2) + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
-
 
     def create_v_tunnel(self, y1, y2, x):
         """Create a vertical tunnel."""
@@ -126,6 +120,55 @@ class GameMap:
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
+    def create_item_entity(self, x, y, entity_data, is_equippable=False):
+        """
+        Create an item entity at specific coordinates on the game map.
+
+        Item can be either consumable (default) or equippable.
+        """
+        item_component = None
+        equippable_component = None
+
+        if is_equippable:
+            equippable_component = Equippable(**entity_data['kwargs'])
+        else:
+            item_component = Item(**entity_data['kwargs'])
+
+        char, color, name = entity_data['entity_args']
+
+        item_entity = Entity(x, y, char, color, name, render_order=RenderOrder.ITEM,
+                                item=item_component, equippable=equippable_component, description=entity_data['description'])
+
+        return item_entity
+
+    def create_monster_entity(self, x, y, entity_data, equipment=None):
+        """
+        Create a monster entity at specific coordinates on the game map.
+
+        Monster can have equipment (none by default).
+        """
+        fighter_component = Fighter(**entity_data['kwargs'])
+        ai_component = BasicMonster()
+        inventory_component = None
+        equipment_component = None
+
+        if equipment:
+                inventory_component = Inventory((len(equipment)))
+                equipment_component = Equipment()
+
+        char, color, name = entity_data['entity_args']
+
+        monster_entity = Entity(x, y, char, color, name, blocks=True,
+                                render_order=RenderOrder.ACTOR, fighter=fighter_component,
+                                ai=ai_component, inventory=inventory_component, equipment=equipment_component, description=entity_data['description'])
+
+        if equipment:
+            for item in equipment:
+                equipment = self.create_item_entity(x, y, item, is_equippable=True)
+                monster_entity.inventory.add_item(equipment)
+                monster_entity.equipment.toggle_equip(equipment)
+
+        return monster_entity
 
     def place_entities(self, room, entities):
         """Place a random number of monsters in each room of the map."""
@@ -151,20 +194,9 @@ class GameMap:
 
                 for monster in monsters:
                     if monster_choice == monster['id']:
-                        fighter_component = Fighter(**monster['kwargs'])
-                        ai_component = BasicMonster()
-                        inventory_component = Inventory(10)
-                        equipment_component = Equipment()
-                        char, color, name = monster['entity_args']
+                        monster_entity = self.create_monster_entity(x, y, monster, monster['equipment'])
 
-                        creature = Entity(x, y, char, color, name, blocks=True,
-                                        render_order=RenderOrder.ACTOR, fighter=fighter_component,
-                                        ai=ai_component, inventory=inventory_component, equipment=equipment_component, description=monster['description'])
-
-                        # creature.inventory.equipment.extend([equipment[0], equipment[1]])
-                        # creature.inventory.update_equipment(creature)
-
-                entities.append(creature)
+                entities.append(monster_entity)
 
         ### Items
         for i in range(number_of_items):
@@ -179,25 +211,16 @@ class GameMap:
 
                     for consumable in consumables:
                         if item_choice == consumable['id']:
-                            item_component = Item(**consumable['kwargs'])
-                            char, color, name = consumable['entity_args']
-
-                            item = Entity(x, y, char, color, name, render_order=RenderOrder.ITEM,
-                                        item=item_component, description=consumable['description'])
+                            item = self.create_item_entity(x, y, consumable)
 
                 else:
                     item_choice = random_choice_from_dict(equipment_chances)
 
                     for equippable in equipment:
                         if item_choice == equippable['id']:
-                            equippable_component = Equippable(**equippable['kwargs'])
-                            char, color, name = equippable['entity_args']
-
-                            item = Entity(x, y, char, color, name, render_order=RenderOrder.ITEM,
-                                        equippable=equippable_component, description=equippable['description'])
+                            item = self.create_item_entity(x, y, equippable, is_equippable=True)
 
                 entities.append(item)
-
 
     def is_blocked(self, x, y):
         """Return True if tile is blocked, otherwise False."""
@@ -205,7 +228,6 @@ class GameMap:
             return True
 
         return False
-
 
     def next_floor(self, player, message_log, constants):
         """"Reset entities (except player) and generate a new dungeon floor."""

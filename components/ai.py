@@ -6,9 +6,8 @@ from game_messages import Message
 
 
 class BasicMonster:
-    """
-    Defines generic monster behaviour.
-    """
+    """Defines generic monster behaviour."""
+
     def take_turn(self, target, fov_map, game_map, entities):
         """Movement and attack during monster turn."""
         results = []
@@ -27,9 +26,8 @@ class BasicMonster:
 
 
 class ConfusedMonster:
-    """
-    Monster behaviour when confused.
-    """
+    """Monster behaviour when confused."""
+
     def __init__(self, previous_ai, number_of_turns=10):
         self.previous_ai = previous_ai
         self.number_of_turns = number_of_turns
@@ -54,14 +52,14 @@ class ConfusedMonster:
 
 
 class FrozenMonster:
-    """
-    Monster behaviour when frozen.
-    """
+    """Monster behaviour when frozen."""
+
     def __init__(self, previous_ai, number_of_turns=5):
         self.previous_ai = previous_ai
         self.number_of_turns = number_of_turns
 
     def take_turn(self, target, fov_map, game_map, entities):
+        """Do not move until freezing effect wears off."""
         results = []
 
         if self.number_of_turns > 0:

@@ -2,6 +2,10 @@ from random import randint
 
 
 def from_dungeon_level(table, dungeon_level):
+    """Get spawn / drop chances from table.
+
+    Searches table in descending order (starting with highest dungeon level)
+    """
     for (value, level) in reversed(table):
         if dungeon_level >= level:
             return value
@@ -25,8 +29,9 @@ def random_choice_index(chances):
 
 def random_choice_from_dict(choice_dict):
     """
-    Uses random_choice_index().
     Select a random key from a dictionary that has spawn chances as values.
+
+    Uses random_choice_index().
     """
     choices = list(choice_dict.keys())
     chances = list(choice_dict.values())

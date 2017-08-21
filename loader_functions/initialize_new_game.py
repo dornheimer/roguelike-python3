@@ -14,6 +14,7 @@ from render_functions import RenderOrder
 
 
 def get_constants():
+    """Return game constants."""
     window_title = 'deepglow roguelike'
 
     screen_width = 80
@@ -80,31 +81,35 @@ def get_constants():
 
 
 def get_game_variables(constants):
-        ### Entities
-        fighter_component = Fighter(hp=100, defense=1, power=3)
-        inventory_component = Inventory(26)
-        level_component = Level()
-        equipment_component = Equipment()
-        player = Entity(0, 0, '@', libtcod.lightest_grey, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
-                    fighter=fighter_component, inventory=inventory_component, level=level_component, equipment=equipment_component, description='You.')
-        entities = [player]
+    """Initialize game variables."""
+    ### Entities
+    fighter_component = Fighter(hp=100, defense=1, power=3)
+    inventory_component = Inventory(26)
+    level_component = Level()
+    equipment_component = Equipment()
+    player = Entity(0, 0, '@', libtcod.lightest_grey, 'Player', blocks=True, render_order=RenderOrder.ACTOR,
+                    fighter=fighter_component, inventory=inventory_component, level=level_component,
+                    equipment=equipment_component, description='You.')
+    entities = [player]
 
-        equippable_component = Equippable(**dagger['kwargs'])
-        char, color, name = dagger['entity_args']
-        starting_weapon = Entity(0, 0, char, color, name, render_order=RenderOrder.ITEM, equippable=equippable_component, description=dagger['description'])
+    equippable_component = Equippable(**dagger['kwargs'])
+    char, color, name = dagger['entity_args']
+    starting_weapon = Entity(0, 0, char, color, name, render_order=RenderOrder.ITEM,
+                            equippable=equippable_component, description=dagger['description'])
 
-        player.inventory.add_item(starting_weapon)
-        player.equipment.toggle_equip(starting_weapon)
+    player.inventory.add_item(starting_weapon)
+    player.equipment.toggle_equip(starting_weapon)
 
-        ### Game map
-        game_map = GameMap(constants['map_width'], constants['map_height'])
-        game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                            constants['map_width'], constants['map_height'], player, entities)
+    ### Game map
+    game_map = GameMap(constants['map_width'], constants['map_height'])
+    game_map.make_map(
+                constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
+                constants['map_width'], constants['map_height'], player, entities)
 
-        ### Message log
-        message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
+    ### Message log
+    message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
 
-        ### Game state
-        game_state = GameStates.PLAYER_TURN
+    ### Game state
+    game_state = GameStates.PLAYER_TURN
 
-        return player, entities, game_map, message_log, game_state
+    return player, entities, game_map, message_log, game_state
