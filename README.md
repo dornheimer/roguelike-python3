@@ -1,5 +1,5 @@
-# roguelike-python3
-r/roguelikedev tutorial (updated to python3)
+# r/RoguelikeDev Does The Complete Roguelike Tutorial
+![RoguelikeDev Does the Complete Roguelike Tutorial Event Logo](https://i.imgur.com/ksc9EW3.png)
 
 Some things i added:
 + freeze scroll (and frozen enemy 'behavior')
