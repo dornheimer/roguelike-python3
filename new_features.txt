@@ -5,7 +5,7 @@
 + target highlighting (single + radius), radius not 100% accurate
 + ui tweaks (colored text, changed font file)
 + added (very basic) description to all entities
-+ description and equipped items show up when mouse is moved over entity8
++ description and equipped items show up when mouse is moved over entity
 + new menu background (source image by christopher balaskas)
 + monsters can have starting equipment
 

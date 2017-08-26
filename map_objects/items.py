@@ -67,7 +67,7 @@ freezing_scroll = {
         'use_function': cast_freeze,
         'targeting': True,
         'targeting_message': Message(
-            'Left-click a target tile for the fireball or right-click to cancel.',
+            'Left-click a target area to freeze or right-click to cancel.',
             targeting_message_color),
         'damage': 10,
         'radius': 1

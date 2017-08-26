@@ -15,6 +15,8 @@ from render_functions import clear_all, render_all
 
 
 def play_game(player, entities, game_map, message_log, game_state, con, panel, cursor, constants):
+    colors = constants['colors']
+
     fov_recompute = True
     fov_map = initialize_fov(game_map)
 
@@ -37,7 +39,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_recompute,
                     message_log, constants['screen_width'], constants['screen_height'],
-                    constants['bar_width'], constants['panel_height'], constants['panel_y'],
+                    constants['bar_width'], constants['panel_width'], constants['panel_x'],
                     mouse, constants['colors'], game_state, targeting_item, key)
 
         fov_recompute = False
@@ -100,7 +102,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
                     break
             else:
-                message_log.add_message(Message('There is nothing here to pick up.', libtcod.yellow))
+                message_log.add_message(Message('There is nothing here to pick up.', colors['text_warning']))
 
         if show_inventory:
             previous_game_state = game_state
@@ -137,7 +139,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
                     break
             else:
-                message_log.add_message(Message('There are no stairs here.', libtcod.yellow))
+                message_log.add_message(Message('There are no stairs here.', colors['text_warning']))
 
         if level_up:
             if level_up == 'hp':
@@ -155,10 +157,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             game_state = GameStates.CHARACTER_SCREEN
 
         if game_state == GameStates.TARGETING:
-            if select_target:
-                current_x, current_y = player.x, player.y
-                dx, dy = select_target
-                new_x, new_y = current_x + dx, current_y + dy
+            # if select_target:
+            #     current_x, current_y = player.x, player.y
+            #     dx, dy = select_target
+            #     new_x, new_y = current_x + dx, current_y + dy
 
             if left_click:
                 target_x, target_y = left_click
@@ -231,10 +233,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     dequipped = equip_result.get('dequipped')
 
                     if equipped:
-                        message_log.add_message(Message('You equipped the {0}'.format(equipped.name)))
+                        message_log.add_message(Message('You equipped the {0}'.format(equipped.name), colors['text_equip']))
 
                     if dequipped:
-                        message_log.add_message(Message('You dequipped the {0}'.format(dequipped.name)))
+                        message_log.add_message(Message('You dequipped the {0}'.format(dequipped.name), colors['text_unequip']))
 
                 game_state = GameStates.ENEMY_TURN
 
@@ -309,7 +311,7 @@ def main():
                                 constants['window_title'], False)
 
     con = libtcod.console_new(constants['screen_width'], constants['screen_height'])
-    panel = libtcod.console_new(constants['screen_width'], constants['panel_height'])
+    panel = libtcod.console_new(constants['panel_width'], constants['screen_height'])
     cursor = libtcod.console_new(constants['map_width'], constants['map_height'])
 
     # Initialize game variables
@@ -332,11 +334,11 @@ def main():
 
         if show_main_menu:
             main_menu(con, main_menu_background_image, constants['screen_width'],
-                        constants['screen_height'])
+                        constants['screen_height'], constants['colors'])
 
             if show_load_error_message:
                 message_box(con, 'no save game to load', 50, constants['screen_width'],
-                            constants['screen_height'])
+                            constants['screen_height'], constants['colors'])
 
             libtcod.console_flush()
 

@@ -15,21 +15,23 @@ from render_functions import RenderOrder
 
 def get_constants():
     """Return game constants."""
-    window_title = 'deepglow roguelike'
+    window_title = 'surprise_peach roguelike'
 
     screen_width = 80
     screen_height = 50
 
-    bar_width = 20
-    panel_height = 7
+    bar_width = 18
+    panel_height = screen_height
+    panel_width = 20
     panel_y = screen_height - panel_height
+    panel_x = 0
 
-    message_x = bar_width + 2
-    message_width = screen_width - bar_width - 2
-    message_height = panel_height - 1
+    message_x = 1
+    message_width = panel_width - 2
+    message_height = panel_height - 33
 
     map_width = 80
-    map_height = 43
+    map_height = 50
 
     room_max_size = 10
     room_min_size = 6
@@ -41,19 +43,28 @@ def get_constants():
 
     colors = {
         'dark_wall': libtcod.black,
-        'dark_wall_char': libtcod.darkest_han,
+        'dark_wall_char': libtcod.Color(28, 5, 58), #libtcod.darkest_han,
         'dark_ground': libtcod.black,
-        'dark_ground_char': libtcod.darkest_azure,
+        'dark_ground_char': libtcod.Color(49, 21, 87), #libtcod.darkest_azure,
         'light_wall': libtcod.black,
-        'light_wall_char': libtcod.desaturated_han,
+        'light_wall_char': libtcod.Color(83, 14, 83), #libtcod.desaturated_han,
         'light_ground': libtcod.black,
-        'light_ground_char': libtcod.desaturated_azure,
-        'text_pickup': None,
-        'text_equip': None,
-        'text_unequip': None,
-        'text_warning': None,
+        'light_ground_char': libtcod.Color(138, 69, 138), #libtcod.desaturated_azure,
+        'background_default': libtcod.black,
+        'background_panel': libtcod.Color(31, 25, 89),
+        'text_default': libtcod.lightest_sepia,
+        'text_emphasize': libtcod.dark_orange,
+        'text_desaturate': libtcod.lightest_sepia * libtcod.light_grey,
+        'text_info': libtcod.light_han,
+        'text_info_alt': libtcod.dark_magenta,
+        'text_pickup': libtcod.darker_sky,
+        'text_equip': libtcod.light_han,
+        'text_unequip': libtcod.dark_magenta,
+        'text_warning': libtcod.yellow,
         'text_target': None,
-        'text_special': None
+        'text_special': libtcod.light_yellow,
+        'render_bar_fg': libtcod.darker_crimson,
+        'render_bar_bg': libtcod.darker_red,
     }
 
     constants = {
@@ -62,6 +73,8 @@ def get_constants():
         'screen_height': screen_height,
         'bar_width': bar_width,
         'panel_height': panel_height,
+        'panel_width': panel_width,
+        'panel_x': panel_x,
         'panel_y': panel_y,
         'message_x': message_x,
         'message_width': message_width,

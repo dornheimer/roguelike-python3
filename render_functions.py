@@ -29,6 +29,7 @@ def get_names_under_mouse(mouse, entities, fov_map):
 def get_entity_information_under_mouse(mouse, entities, fov_map):
     """
     Return description of entity if mouse is on top.
+
     When applicable, show equipped items.
     """
     (x, y) = (mouse.cx, mouse.cy)
@@ -71,7 +72,7 @@ def show_target(cursor, mouse, key, map_width, map_height, targeting_item):
     libtcod.console_blit(cursor, 0, 0, map_width, map_height, 0, 0, 0, 1.0, 0.5)
 
 
-def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
+def render_bar(panel, x, y, total_width, name, value, maximum, text_color, bar_color, back_color):
     """Draw health bar in bottom panel console."""
     bar_width = int(float(value) / maximum * total_width)
 
@@ -82,20 +83,28 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     if bar_width > 0:
         libtcod.console_rect(panel, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
 
-    libtcod.console_set_default_foreground(panel, libtcod.lightest_grey)
+    libtcod.console_set_default_foreground(panel, text_color)
     libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE,
                                 libtcod.CENTER, '{0}: {1}/{2}'.format(name, value, maximum))
 
 
-def render_info(panel, x, y, name, value, color):
+def render_info(panel, x, y, name, color, value=None, bonus=0):
     libtcod.console_set_default_foreground(panel, color)
 
+    info = f'{name}'
+
+    if value:
+        info = f'{name}: {value}'
+
+    if bonus:
+        info += f'(+{bonus})'
+
     libtcod.console_print_ex(panel, x, y, libtcod.BKGND_NONE,
-                                libtcod.LEFT, '{0}: {1}'.format(name, value))
+                                libtcod.LEFT, info)
 
 
 def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width,
-                screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state, targeting_item, key):
+                screen_height, bar_width, panel_width, panel_x, mouse, colors, game_state, targeting_item, key):
     """
     Draw all tiles on the game (FOV) map and all entities in the list (con).
     Render panel and targeting (cursor) consoles.
@@ -134,51 +143,58 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
 
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
-    libtcod.console_set_default_background(con, libtcod.black)
+    libtcod.console_set_default_background(con, colors['background_default'])
 
 
     ### Panel console
-    libtcod.console_set_default_background(panel, libtcod.black)
+    libtcod.console_set_default_background(panel, colors['background_panel'])
     libtcod.console_clear(panel)
 
     # Print the message, one line at a time
-    y = 1
+    y = 32
     for message in message_log.messages:
+        # if y % 2 == 0 and message.color == libtcod.lightest_grey:
+        #     libtcod.console_set_default_foreground(panel, libtcod.grey)
+        # else:
         libtcod.console_set_default_foreground(panel, message.color)
         libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
         y += 1
 
-    render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp,
-                libtcod.darker_crimson, libtcod.darker_red)
+    render_info(panel, 1, 1, player.name.upper(), colors['text_info_alt'], None)
+    render_info(panel, 1, 2, 'Dungeon Level', colors['text_emphasize'], game_map.dungeon_level)
 
-    render_info(panel, 1, 2, 'Dungeon Level', game_map.dungeon_level, libtcod.light_sepia)
-    render_info(panel, 1, 3, 'Attack', player.fighter.power, libtcod.lightest_grey)
-    render_info(panel, 1, 4, 'Defense', player.fighter.defense, libtcod.lightest_grey)
+    render_bar(panel, 1, 4, bar_width, 'HP', player.fighter.hp, player.fighter.max_hp, colors['text_default'],
+                colors['render_bar_fg'], colors['render_bar_bg'])
+    render_bar(panel, 1, 5, bar_width, 'XP', player.level.current_xp, player.level.experience_to_next_level, colors['text_default'],
+                libtcod.orange, libtcod.dark_orange)
 
-    libtcod.console_set_default_foreground(panel, libtcod.light_gray)
+    render_info(panel, 1, 7, 'Attack', colors['text_default'], player.fighter.power, player.equipment.power_bonus)
+    render_info(panel, 1, 8, 'Defense', colors['text_default'], player.fighter.defense, player.equipment.defense_bonus)
+
+    libtcod.console_set_default_foreground(panel, colors['text_desaturate'])
     libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
                                 get_names_under_mouse(mouse, entities, fov_map))
     description_box(con, get_entity_information_under_mouse(mouse, entities, fov_map),
-                        10, screen_width, screen_height, mouse.cx, mouse.cy)
+                        10, screen_width, screen_height, mouse.cx, mouse.cy, colors)
 
-    libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
+    libtcod.console_blit(panel, 0, 0, panel_width, screen_height, 0, panel_x, 0)
 
     if game_state in {GameStates.SHOW_INVENTORY, GameStates.SHOW_EQUIPMENT, GameStates.DROP_INVENTORY}:
         if game_state == GameStates.SHOW_INVENTORY:
             inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
-            inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
+            inventory_menu(con, inventory_title, player, 30, screen_width, screen_height, colors)
         elif game_state == GameStates.DROP_INVENTORY:
             inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
-            inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
+            inventory_menu(con, inventory_title, player, 30, screen_width, screen_height, colors)
         else:
             inventory_title = 'Press the key next to an item to unequip it, or Esc to cancel.\n'
-            equipment_menu(con, inventory_title, player, 30, screen_width, screen_height)
+            equipment_menu(con, inventory_title, player, 30, screen_width, screen_height, colors)
 
     elif game_state == GameStates.LEVEL_UP:
-        level_up_menu(con, 'Level up! Choose at stat to raise:', player, 40, screen_width, screen_height)
+        level_up_menu(con, 'Level up! Choose at stat to raise:', player, 30, screen_width, screen_height, colors)
 
     elif game_state == GameStates.CHARACTER_SCREEN:
-        character_screen(player, 30, 10, screen_width, screen_height)
+        character_screen(player, 30, 10, screen_width, screen_height, colors)
 
     elif game_state == GameStates.TARGETING:
         show_target(cursor, mouse, key, game_map.width, game_map.height, targeting_item)

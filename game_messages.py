@@ -6,7 +6,7 @@ import textwrap
 class Message:
     """Class for basic text message with a color."""
 
-    def __init__(self, text, color=libtcod.lightest_grey):
+    def __init__(self, text, color=libtcod.lightest_sepia):
         self.text = text
         self.color = color
 
@@ -19,6 +19,7 @@ class MessageLog:
         self.x = x
         self.width = width
         self.height = height
+        self.previous_message_color = libtcod.black
 
     def add_message(self, message):
         """
@@ -28,6 +29,12 @@ class MessageLog:
         """
         # Split the message if necessary, among multiple lines
         new_msg_lines = textwrap.wrap(message.text, self.width)
+
+        if message.color == self.previous_message_color:
+            message.color = message.color * libtcod.light_grey
+            self.previous_message_color = libtcod.black
+        else:
+            self.previous_message_color = message.color
 
         for line in new_msg_lines:
             # If the buffer is full, remove the first line to make room for the new one

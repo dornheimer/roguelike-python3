@@ -46,8 +46,8 @@ class GameMap:
             w = randint(room_min_size, room_max_size)
             h = randint(room_min_size, room_max_size)
             # random position without going out of the boundaries of the map
-            x = randint(0, map_width - w - 1)
-            y = randint(0, map_height - h - 1)
+            x = randint(20, map_width - w - 1)
+            y = randint(20, map_height - h - 1)
 
             # 'Rect' class makes rectangles easier to work with
             new_room = Rect(x, y, w, h)
