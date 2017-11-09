@@ -8,6 +8,7 @@ from components.level import Level
 from entity import Entity
 from game_messages import MessageLog
 from game_states import GameStates
+from map_objects.dungeon import Tunnel
 from map_objects.game_map import GameMap
 from map_objects.items import dagger
 from render_functions import RenderOrder
@@ -115,9 +116,10 @@ def get_game_variables(constants):
 
     ### Game map
     game_map = GameMap(constants['map_width'], constants['map_height'])
+    dungeon_type = Tunnel
     game_map.make_map(
                 constants['max_rooms'], constants['room_min_size'],
-                constants['room_max_size'], player, entities)
+                constants['room_max_size'], dungeon_type, player, entities)
 
     ### Message log
     message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])

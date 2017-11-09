@@ -18,16 +18,7 @@ class dunGen:
 
     def initialize_tiles(self):
         """Fill game map with blocked tiles."""
-        tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
-
-        return tiles
-
-    def is_blocked(self, x, y):
-        """Return True if tile is blocked, otherwise False."""
-        if self.tiles[x][y].blocked:
-            return True
-
-        return False
+        return [[Tile(True) for y in range(self.height)] for x in range(self.width)]
 
 
 class Tunnel(dunGen):

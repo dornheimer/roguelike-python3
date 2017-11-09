@@ -1,5 +1,5 @@
 import libtcodpy as libtcod
-from random import randint
+from random import choice, randint
 
 from components.ai import BasicMonster
 from components.equipment import Equipment
@@ -19,21 +19,20 @@ from render_functions import RenderOrder
 class GameMap:
     """Contains methods for initializing tiles and creating rooms with monsters and items."""
 
-    def __init__(self, width, height, dungeon_level=1, gen=Tunnel):
+    def __init__(self, width, height, dungeon_level=1):
         self.width = width
         self.height = height
         self.dungeon = None
         self.tiles = None
         self.dungeon_level = dungeon_level
-        self.gen = gen
 
     def is_blocked(self, x, y):
         """Return True if tile is blocked, otherwise False."""
         return self.dungeon.tiles[x][y].blocked
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, player, entities):
+    def make_map(self, max_rooms, room_min_size, room_max_size, dungeon_type, player, entities):
         """Carve randomly generated rooms out of the game map."""
-        self.dungeon = self.gen(self.width, self.height, self.dungeon_level)
+        self.dungeon = dungeon_type(self.width, self.height, self.dungeon_level)
         self.dungeon.create_dungeon(max_rooms, room_min_size, room_max_size, player, entities)
         self.tiles = self.dungeon.tiles
 
@@ -148,8 +147,9 @@ class GameMap:
         self.dungeon_level += 1
         entities = [player]
 
+        dungeon_type = choice([Tunnel])
         self.make_map(constants['max_rooms'], constants['room_min_size'],
-                        constants['room_max_size'], player, entities)
+                        constants['room_max_size'], dungeon_type, player, entities)
 
         player.fighter.heal(player.fighter.max_hp // 2)
 
