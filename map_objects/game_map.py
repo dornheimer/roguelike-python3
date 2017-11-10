@@ -9,7 +9,7 @@ from components.inventory import Inventory
 from components.item import Item
 from entity import Entity
 from game_messages import Message
-from map_objects.dungeon import Tunnel, BSPTree
+from map_objects.dungeon import Tunnel, BSPTree, DrunkardsWalk
 from map_objects.items import consumables, equipment, max_items_dungeon
 from map_objects.monsters import max_monsters_dungeon, monsters
 from random_utils import from_dungeon_level, random_choice_from_dict
@@ -32,7 +32,8 @@ class GameMap:
                         Tunnel: (self.width, self.height, self.room_min_size,
                                 self.room_max_size, self.dungeon_level),
                         BSPTree: (self.width, self.height, self.room_min_size,
-                                self.room_max_size, self.dungeon_level)
+                                self.room_max_size, self.dungeon_level),
+                        DrunkardsWalk: (self.width, self.height, dungeon_level)
         }
 
     def is_blocked(self, x, y):
@@ -46,12 +47,15 @@ class GameMap:
         self.dungeon.create_dungeon(entities)
         self.tiles = self.dungeon.tiles
 
-        # Put player in first room
-        player.x, player.y = self.dungeon.rooms[0].center()
+        if dungeon_type in (Tunnel, BSPTree):
+            # Put player in first room
+            player.x, player.y = self.dungeon.rooms[0].center()
 
-        # Put entities into every other room
-        for room in self.dungeon.rooms[1:]:
-            self.place_entities(room, entities)
+            # Put entities into every other room
+            for room in self.dungeon.rooms[1:]:
+                self.place_entities(room, entities)
+        elif dungeon_type == DrunkardsWalk:
+            player.x, player.y = choice(self.dungeon.cleared)
 
     def create_item_entity(self, x, y, entity_data, is_equippable=False):
         """

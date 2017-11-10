@@ -8,7 +8,7 @@ from components.level import Level
 from entity import Entity
 from game_messages import MessageLog
 from game_states import GameStates
-from map_objects.dungeon import Tunnel, BSPTree
+from map_objects.dungeon import Tunnel, BSPTree, DrunkardsWalk
 from map_objects.game_map import GameMap
 from map_objects.items import dagger
 from render_functions import RenderOrder
@@ -119,7 +119,9 @@ def get_game_variables(constants):
     # === Game map ===
     game_map = GameMap(constants['map_width'], constants['map_height'],
                         constants['room_min_size'], constants['room_max_size'])
-    dungeon_type = Tunnel
+    #dungeon_type = Tunnel
+    dungeon_type = DrunkardsWalk
+    #dungeon_type = BSPTree
     game_map.make_map(dungeon_type, player, entities)
 
     # === Message log ===

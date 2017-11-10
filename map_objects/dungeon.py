@@ -1,5 +1,5 @@
 import libtcodpy as libtcod
-from random import randint, random
+from random import choice, choices, randint, random
 
 from entity import Entity
 from map_objects.dungeon_helper import Node, Rect
@@ -19,6 +19,13 @@ class DunGen:
     def initialize_tiles(self):
         """Fill game map with blocked tiles."""
         return [[Tile(True) for y in range(self.height)] for x in range(self.width)]
+
+    def create_stairs(self, x, y, entities):
+        """Create stairs at coordinates."""
+        stairs_component = Stairs(self.dungeon_level + 1)
+        down_stairs = Entity(x, y, '>', libtcod.lightest_grey, 'Stairs',
+                             render_order=RenderOrder.STAIRS, stairs=stairs_component)
+        entities.append(down_stairs)
 
 
 class Rectangular:
@@ -61,23 +68,11 @@ class Rectangular:
             self.create_v_tunnel(y2, y1, x2)
             self.create_h_tunnel(x2, x1, y2)
 
-    def create_stairs(self, entities):
-        """Create stairs in last room."""
-        center_last_room_x, center_last_room_y = self.rooms[-1].center()
-        stairs_component = Stairs(self.dungeon_level + 1)
-        down_stairs = Entity(center_last_room_x, center_last_room_y, '>', libtcod.lightest_grey, 'Stairs',
-                             render_order=RenderOrder.STAIRS, stairs=stairs_component)
-        entities.append(down_stairs)
-
 
 class Tunnel(DunGen, Rectangular):
     """
     Create rectangular rooms of at random locations
     in the dungeon and connect them.
-
-    The location and size of a room are chosen randomly (within bounds) and it
-    will only be created if it does not overlap with previously created rooms.
-    Rooms will connect to their previous room.
     """
     def __init__(self, width, height, room_min_size, room_max_size, dungeon_level):
         super().__init__(width, height, dungeon_level)
@@ -87,6 +82,12 @@ class Tunnel(DunGen, Rectangular):
         self.max_rooms = 30
 
     def create_dungeon(self, entities):
+        """
+        The location and size of a room are chosen randomly and it will only
+        be created if it does not overlap with previously created rooms.
+        Rooms will connect to their previous room,
+        stairs will be placed in the last room.
+        """
         num_rooms = 0
         for r in range(self.max_rooms):
             # Random width and height
@@ -114,7 +115,8 @@ class Tunnel(DunGen, Rectangular):
                 self.rooms.append(new_room)
                 num_rooms += 1
 
-        self.create_stairs(entities)
+        center_last_room_x, center_last_room_y = self.rooms[-1].center()
+        self.create_stairs(center_last_room_x, center_last_room_y, entities)
 
 
 class BSPTree(DunGen, Rectangular):
@@ -131,6 +133,11 @@ class BSPTree(DunGen, Rectangular):
         self.rooms = []
 
     def create_dungeon(self, entities):
+        """
+        Create root node of the tree and split recursively until nodes can no
+        longer split. Carve out rooms in node areas and connect.
+        Stairs are placed in the last room.
+        """
         root_node = Node(0, 0, self.width, self.height)
         self._nodes.append(root_node)
 
@@ -151,4 +158,95 @@ class BSPTree(DunGen, Rectangular):
 
         root_node.create_rooms(self, self.room_min_size, self.room_max_size)
 
-        self.create_stairs(entities)
+        center_last_room_x, center_last_room_y = self.rooms[-1].center()
+        self.create_stairs(center_last_room_x, center_last_room_y, entities)
+
+
+class DrunkardsWalk(DunGen):
+    """
+    Move randomly to carve out a cave like area.
+    """
+    def __init__(self, width, height, dungeon_level):
+        super().__init__(width, height, dungeon_level)
+        self._percent_goal = 0.4
+        self.walk_iterations = 25000  # Cut off in case _percent_goal is never reached
+        self.weighted_toward_center = 0.15
+        self.weighted_toward_prev_direction = 0.7
+
+    @property
+    def cleared(self):
+        """List of coordinates that have been cleared."""
+        cleared = []
+        for x, col in enumerate(self.tiles):
+            for y, tile in enumerate(col):
+                if not tile.blocked:
+                    cleared.append((x, y))
+        return cleared
+
+    def create_dungeon(self, entities):
+        """Walk until either goal or maximum iterations have been reached."""
+        self.walk_iterations = max(self.walk_iterations, (self.width * self.height * 10))
+        self._tiles_filled = 0
+        self._prev_direction = None
+
+        self.drunkard_x = randint(2, self.width - 2)
+        self.drunkard_y = randint(2, self.height - 2)
+        self.tiles_goal = self.width * self.height * self._percent_goal
+
+        for i in range(self.walk_iterations):
+            self.walk()
+            if self._tiles_filled >= self.tiles_goal:
+                break
+
+        self.create_stairs(self.drunkard_x, self.drunkard_y, entities)
+
+    def walk(self):
+        """
+        Take a step into a random direction and unblock the destination tile.
+
+        Directions' probability weights take into account map dimensions,
+        if the current position is close to one of the edges and the
+        direction of the previous step.
+        """
+        # === Choose direction ===
+        # Increase probability of movement relative to map dimensions
+        v_move = self.width / self.height
+        h_move = self.height / self.width
+        north, south, east, west = v_move, v_move, h_move, h_move
+
+        # Weight the random walk against the edges
+        if self.drunkard_x < self.width * 0.25:  # far left side of map
+            east += self.weighted_toward_center
+        elif self.drunkard_x > self.width * 0.75:  # far right side of map
+            west += self.weighted_toward_center
+        if self.drunkard_y < self.height * 0.25:  # top of the map
+            south += self.weighted_toward_center
+        elif self.drunkard_y > self.height * 0.75:  # bottom of the map
+            north += self.weighted_toward_center
+
+        # Weight in favor of the previous direction
+        if self._prev_direction == "north":
+            north += self.weighted_toward_prev_direction
+        if self._prev_direction == "south":
+            south += self.weighted_toward_prev_direction
+        if self._prev_direction == "east":
+            east += self.weighted_toward_prev_direction
+        if self._prev_direction == "west":
+            west += self.weighted_toward_prev_direction
+
+        weights = [south, north, east, west]
+        moves = {"south": (0, 1), "north": (0, -1), "east": (1, 0), "west": (-1, 0)}
+
+        direction = choices(list(moves.keys()), weights)[0]
+        dx, dy = moves[direction]
+
+        # === Walk ===
+        # check collision at edges
+        if (1 < self.drunkard_x + dx < self.width - 1) and (1 < self.drunkard_y + dy < self.height - 1):
+            self.drunkard_x += dx
+            self.drunkard_y += dy
+            if self.tiles[self.drunkard_x][self.drunkard_y]:
+                self.tiles[self.drunkard_x][self.drunkard_y].blocked = False
+                self.tiles[self.drunkard_x][self.drunkard_y].block_sight = False
+                self._tiles_filled += 1
+            self._prev_direction = direction
