@@ -18,19 +18,23 @@ def get_constants():
     """Return game constants."""
     window_title = 'surprise_peach roguelike'
 
+    # Window size
     screen_width = 80
     screen_height = 50
 
-    bar_width = 18
+    # Panel
     panel_height = screen_height
     panel_width = 20
     panel_y = screen_height - panel_height
     panel_x = 0
 
+    bar_width = 18
+
     message_x = 1
     message_width = panel_width - 2
     message_height = panel_height - 33
 
+    # Map
     map_width = 80 - panel_width
     map_height = screen_height
 

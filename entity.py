@@ -100,6 +100,7 @@ class Entity:
                 libtcod.map_set_properties(fov, entity.x, entity.y, True, False)
 
         # Allocate a A* path
+        # 1.41 = sqrt(1sq + 1sq)
         # The 1.41 is the normal diagonal cost of moving, it can be set as 0.0 if diagonal moves are prohibited
         my_path = libtcod.path_new_using_map(fov, 1.41)
 
