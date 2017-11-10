@@ -310,7 +310,7 @@ def main():
     libtcod.console_init_root(constants['screen_width'], constants['screen_height'],
                                 constants['window_title'], False)
 
-    con = libtcod.console_new(constants['screen_width'], constants['screen_height'])
+    con = libtcod.console_new(constants['map_width'], constants['map_height'])
     panel = libtcod.console_new(constants['panel_width'], constants['screen_height'])
     cursor = libtcod.console_new(constants['map_width'], constants['map_height'])
 

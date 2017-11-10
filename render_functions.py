@@ -141,7 +141,8 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
     for entity in entities_in_render_order:
         draw_entity(con, entity, fov_map, game_map)
 
-    libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+    # offset console by panel_width
+    libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, panel_width, 0)
 
     libtcod.console_set_default_background(con, colors['background_default'])
 
