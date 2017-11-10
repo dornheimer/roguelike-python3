@@ -8,7 +8,7 @@ from components.level import Level
 from entity import Entity
 from game_messages import MessageLog
 from game_states import GameStates
-from map_objects.dungeon import Tunnel
+from map_objects.dungeon import Tunnel, BSPTree
 from map_objects.game_map import GameMap
 from map_objects.items import dagger
 from render_functions import RenderOrder
@@ -40,7 +40,6 @@ def get_constants():
 
     room_max_size = 10
     room_min_size = 6
-    max_rooms = 30
 
     fov_algorithm = 0
     fov_light_walls = True
@@ -88,7 +87,6 @@ def get_constants():
         'map_height': map_height,
         'room_max_size': room_max_size,
         'room_min_size': room_min_size,
-        'max_rooms': max_rooms,
         'fov_algorithm': fov_algorithm,
         'fov_light_walls': fov_light_walls,
         'fov_radius': fov_radius,
@@ -100,7 +98,7 @@ def get_constants():
 
 def get_game_variables(constants):
     """Initialize game variables."""
-    ### Entities
+    # === Entities ===
     fighter_component = Fighter(hp=100, defense=1, power=3)
     inventory_component = Inventory(26)
     level_component = Level()
@@ -118,17 +116,16 @@ def get_game_variables(constants):
     player.inventory.add_item(starting_weapon)
     player.equipment.toggle_equip(starting_weapon)
 
-    ### Game map
-    game_map = GameMap(constants['map_width'], constants['map_height'])
+    # === Game map ===
+    game_map = GameMap(constants['map_width'], constants['map_height'],
+                        constants['room_min_size'], constants['room_max_size'])
     dungeon_type = Tunnel
-    game_map.make_map(
-                constants['max_rooms'], constants['room_min_size'],
-                constants['room_max_size'], dungeon_type, player, entities)
+    game_map.make_map(dungeon_type, player, entities)
 
-    ### Message log
+    # === Message log ===
     message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
 
-    ### Game state
+    # === Game state ===
     game_state = GameStates.PLAYER_TURN
 
     return player, entities, game_map, message_log, game_state

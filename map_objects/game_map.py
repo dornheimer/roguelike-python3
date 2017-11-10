@@ -9,7 +9,7 @@ from components.inventory import Inventory
 from components.item import Item
 from entity import Entity
 from game_messages import Message
-from map_objects.dungeon import Tunnel
+from map_objects.dungeon import Tunnel, BSPTree
 from map_objects.items import consumables, equipment, max_items_dungeon
 from map_objects.monsters import max_monsters_dungeon, monsters
 from random_utils import from_dungeon_level, random_choice_from_dict
@@ -19,25 +19,38 @@ from render_functions import RenderOrder
 class GameMap:
     """Contains methods for initializing tiles and creating rooms with monsters and items."""
 
-    def __init__(self, width, height, dungeon_level=1):
+    def __init__(self, width, height, room_min_size, room_max_size, dungeon_level=1):
         self.width = width
         self.height = height
+        self.room_min_size = room_min_size
+        self.room_max_size = room_max_size
+        self.dungeon_level = dungeon_level
         self.dungeon = None
         self.tiles = None
-        self.dungeon_level = dungeon_level
+
+        self.dun_gens = {
+                        Tunnel: (self.width, self.height, self.room_min_size,
+                                self.room_max_size, self.dungeon_level),
+                        BSPTree: (self.width, self.height, self.room_min_size,
+                                self.room_max_size, self.dungeon_level)
+        }
 
     def is_blocked(self, x, y):
         """Return True if tile is blocked, otherwise False."""
         return self.dungeon.tiles[x][y].blocked
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, dungeon_type, player, entities):
+    def make_map(self, dungeon_type, player, entities):
         """Carve randomly generated rooms out of the game map."""
-        self.dungeon = dungeon_type(self.width, self.height, self.dungeon_level)
-        self.dungeon.create_dungeon(max_rooms, room_min_size, room_max_size, player, entities)
+        parameters = self.dun_gens[dungeon_type]
+        self.dungeon = dungeon_type(*parameters)
+        self.dungeon.create_dungeon(entities)
         self.tiles = self.dungeon.tiles
 
-        # put entities into every room
-        for room in self.dungeon.rooms:
+        # Put player in first room
+        player.x, player.y = self.dungeon.rooms[0].center()
+
+        # Put entities into every other room
+        for room in self.dungeon.rooms[1:]:
             self.place_entities(room, entities)
 
     def create_item_entity(self, x, y, entity_data, is_equippable=False):
@@ -103,7 +116,7 @@ class GameMap:
         consumables_chances = {c['id']: from_dungeon_level(c['drop_chance'], self.dungeon_level) for c in consumables}
         equipment_chances = {e['id']: from_dungeon_level(e['drop_chance'], self.dungeon_level) for e in equipment}
 
-        ### Monsters
+        # === Monsters ===
         for i in range(number_of_monsters):
             # Choose a random location in the room
             x = randint(room.x1 + 1, room.x2 - 1)
@@ -118,7 +131,7 @@ class GameMap:
 
                 entities.append(monster_entity)
 
-        ### Items
+        # === Items ===
         for i in range(number_of_items):
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
@@ -147,9 +160,8 @@ class GameMap:
         self.dungeon_level += 1
         entities = [player]
 
-        dungeon_type = choice([Tunnel])
-        self.make_map(constants['max_rooms'], constants['room_min_size'],
-                        constants['room_max_size'], dungeon_type, player, entities)
+        dungeon_type = choice([Tunnel, BSPTree])
+        self.make_map(dungeon_type, player, entities)
 
         player.fighter.heal(player.fighter.max_hp // 2)
 
