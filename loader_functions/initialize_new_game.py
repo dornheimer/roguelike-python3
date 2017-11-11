@@ -119,9 +119,9 @@ def get_game_variables(constants):
     # === Game map ===
     game_map = GameMap(constants['map_width'], constants['map_height'],
                         constants['room_min_size'], constants['room_max_size'])
-    #dungeon_type = Tunnel
-    dungeon_type = DrunkardsWalk
-    #dungeon_type = BSPTree
+    dungeon_type = Tunnel
+    # dungeon_type = DrunkardsWalk
+    # dungeon_type = BSPTree
     game_map.make_map(dungeon_type, player, entities)
 
     # === Message log ===

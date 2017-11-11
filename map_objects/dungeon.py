@@ -1,39 +1,30 @@
-import libtcodpy as libtcod
-from random import choice, choices, randint, random
+"""
+Collection of dungeon generation algorithms that initialize map tiles and
+carve out the dungeon layout.
+"""
+from random import choices, randint, random
 
-from entity import Entity
 from map_objects.dungeon_helper import Node, Rect
-from map_objects.stairs import Stairs
 from map_objects.tile import Tile
-from render_functions import RenderOrder
 
 
 class DunGen:
     """Base class for dungeon generation algorithms."""
-    def __init__(self, width, height, dungeon_level):
+    def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.dungeon_level = dungeon_level
         self.tiles = self.initialize_tiles()
 
     def initialize_tiles(self):
         """Fill game map with blocked tiles."""
         return [[Tile(True) for y in range(self.height)] for x in range(self.width)]
 
-    def create_stairs(self, x, y, entities):
-        """Create stairs at coordinates."""
-        stairs_component = Stairs(self.dungeon_level + 1)
-        down_stairs = Entity(x, y, '>', libtcod.lightest_grey, 'Stairs',
-                             render_order=RenderOrder.STAIRS, stairs=stairs_component)
-        entities.append(down_stairs)
-
-
 class Rectangular:
     """
     Collection of methods that create and connect
     rectangular rooms in a dungeon.
 
-    Can only be used as an 'addon' to the DunGen class.
+    Helper class that can only be used as an 'addon' to the DunGen class.
     """
     def create_room(self, room):
         """Go through the tiles in the rectangle and make them passable."""
@@ -74,8 +65,8 @@ class Tunnel(DunGen, Rectangular):
     Create rectangular rooms of at random locations
     in the dungeon and connect them.
     """
-    def __init__(self, width, height, room_min_size, room_max_size, dungeon_level):
-        super().__init__(width, height, dungeon_level)
+    def __init__(self, width, height, room_min_size, room_max_size):
+        super().__init__(width, height)
         self.room_min_size = room_min_size
         self.room_max_size = room_max_size
         self.rooms = []
@@ -115,17 +106,14 @@ class Tunnel(DunGen, Rectangular):
                 self.rooms.append(new_room)
                 num_rooms += 1
 
-        center_last_room_x, center_last_room_y = self.rooms[-1].center()
-        self.create_stairs(center_last_room_x, center_last_room_y, entities)
-
 
 class BSPTree(DunGen, Rectangular):
     """
     Recursively divide the area of the dungeon into sub areas and
     create rooms within them.
     """
-    def __init__(self, width, height, room_min_size, room_max_size, dungeon_level):
-        super().__init__(width, height, dungeon_level)
+    def __init__(self, width, height, room_min_size, room_max_size):
+        super().__init__(width, height)
         self.room_min_size = room_min_size
         self.room_max_size = room_max_size
         self._nodes = []
@@ -158,20 +146,18 @@ class BSPTree(DunGen, Rectangular):
 
         root_node.create_rooms(self, self.room_min_size, self.room_max_size)
 
-        center_last_room_x, center_last_room_y = self.rooms[-1].center()
-        self.create_stairs(center_last_room_x, center_last_room_y, entities)
-
 
 class DrunkardsWalk(DunGen):
     """
     Move randomly to carve out a cave like area.
     """
-    def __init__(self, width, height, dungeon_level):
-        super().__init__(width, height, dungeon_level)
+    def __init__(self, width, height):
+        super().__init__(width, height)
         self._percent_goal = 0.4
         self.walk_iterations = 25000  # Cut off in case _percent_goal is never reached
         self.weighted_toward_center = 0.15
         self.weighted_toward_prev_direction = 0.7
+        self.zones = []
 
     @property
     def cleared(self):
@@ -182,6 +168,25 @@ class DrunkardsWalk(DunGen):
                 if not tile.blocked:
                     cleared.append((x, y))
         return cleared
+
+    def scan_for_zones(self):
+        sections = []
+        # divide map into min_room_size sized rectangles and check if they fit
+        # in the dungeon layout
+        w, h = 3, 3
+
+        for x in range(0, self.width-w-1, w):
+            for y in range(0, self.height-h-1, h):
+                sections.append(Rect(x, y, w, h))
+
+        for s in sections:
+            section_tiles = [(x, y) for x in range(s.x1, s.x2) for y in range(s.y1, s.y2)]
+            if all([st in self.cleared for st in section_tiles]):
+                # 50% chance to make zone eligible for spawning
+                if random() >= 0.5:
+                    self.zones.append(s)
+
+        print(len(self.zones))
 
     def create_dungeon(self, entities):
         """Walk until either goal or maximum iterations have been reached."""
@@ -198,7 +203,7 @@ class DrunkardsWalk(DunGen):
             if self._tiles_filled >= self.tiles_goal:
                 break
 
-        self.create_stairs(self.drunkard_x, self.drunkard_y, entities)
+        self.scan_for_zones()
 
     def walk(self):
         """

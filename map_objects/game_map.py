@@ -1,3 +1,6 @@
+"""
+Handles dungeon generation and progression logic and places entities on the map.
+"""
 import libtcodpy as libtcod
 from random import choice, randint
 
@@ -12,6 +15,7 @@ from game_messages import Message
 from map_objects.dungeon import Tunnel, BSPTree, DrunkardsWalk
 from map_objects.items import consumables, equipment, max_items_dungeon
 from map_objects.monsters import max_monsters_dungeon, monsters
+from map_objects.stairs import Stairs
 from random_utils import from_dungeon_level, random_choice_from_dict
 from render_functions import RenderOrder
 
@@ -29,11 +33,9 @@ class GameMap:
         self.tiles = None
 
         self.dun_gens = {
-                        Tunnel: (self.width, self.height, self.room_min_size,
-                                self.room_max_size, self.dungeon_level),
-                        BSPTree: (self.width, self.height, self.room_min_size,
-                                self.room_max_size, self.dungeon_level),
-                        DrunkardsWalk: (self.width, self.height, dungeon_level)
+            Tunnel: (self.width, self.height, self.room_min_size, self.room_max_size),
+            BSPTree: (self.width, self.height, self.room_min_size, self.room_max_size),
+            DrunkardsWalk: (self.width, self.height)
         }
 
     def is_blocked(self, x, y):
@@ -54,8 +56,23 @@ class GameMap:
             # Put entities into every other room
             for room in self.dungeon.rooms[1:]:
                 self.place_entities(room, entities)
+
+            # Put stairs in last room
+            center_last_room_x, center_last_room_y = self.dungeon.rooms[-1].center()
+            self.place_stairs(center_last_room_x, center_last_room_y, entities)
+
         elif dungeon_type == DrunkardsWalk:
+            # Choose player and stairs location at random
             player.x, player.y = choice(self.dungeon.cleared)
+            stairs_x, stairs_y = choice(self.dungeon.cleared)
+            # Make sure they are not at the same location
+            while (stairs_x, stairs_y) == (player.x, player.y):
+                stairs_x, stairs_y = choice(self.dungeon.cleared)
+
+            self.place_stairs(stairs_x, stairs_y, entities)
+
+            for zone in self.dungeon.zones:
+                self.place_entities(zone, entities)
 
     def create_item_entity(self, x, y, entity_data, is_equippable=False):
         """
@@ -114,7 +131,6 @@ class GameMap:
         # Get a random number of monsters and items
         number_of_monsters = randint(0, max_monsters_per_room)
         number_of_items = randint(0, max_items_per_room)
-
         # Generate dictionary (elem -> chance ) for the appropriate dungeon level
         monster_chances = {m['id']: from_dungeon_level(m['spawn_chance'], self.dungeon_level) for m in monsters}
         consumables_chances = {c['id']: from_dungeon_level(c['drop_chance'], self.dungeon_level) for c in consumables}
@@ -159,12 +175,19 @@ class GameMap:
 
                 entities.append(item)
 
+    def place_stairs(self, x, y, entities):
+        """Create stairs at coordinates."""
+        stairs_component = Stairs(self.dungeon_level + 1)
+        down_stairs = Entity(x, y, '>', libtcod.lightest_grey, 'Stairs',
+                             render_order=RenderOrder.STAIRS, stairs=stairs_component)
+        entities.append(down_stairs)
+
     def next_floor(self, player, message_log, constants):
         """"Reset entities (except player) and generate a new dungeon floor."""
         self.dungeon_level += 1
         entities = [player]
 
-        dungeon_type = choice([Tunnel, BSPTree])
+        dungeon_type = choice([Tunnel, BSPTree, DrunkardsWalk])
         self.make_map(dungeon_type, player, entities)
 
         player.fighter.heal(player.fighter.max_hp // 2)

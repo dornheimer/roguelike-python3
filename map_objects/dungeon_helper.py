@@ -2,8 +2,9 @@ from random import choice, randint, random
 
 
 class Rect:
-    """Rectangle specified by x, y coordinates and side lengths (w, h)."""
-
+    """
+    Rectangle specified by x, y coordinates and side lengths (w, h).
+    """
     def __init__(self, x, y, w, h):
         self.x1 = x
         self.y1 = y
@@ -17,14 +18,17 @@ class Rect:
         return (center_x, center_y)
 
     def intersect(self, other):
-        """Return True if this rectangle intersects with another one."""
+        """
+        Return True if this rectangle intersects with another one.
+        """
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
                 self.y1 <= other.y2 and self.y2 >= other.y1)
 
 
 class Node:
-    """Node in BSP Tree."""
-
+    """
+    Node in BSP Tree.
+    """
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
@@ -70,10 +74,10 @@ class Node:
 
         if split_horizontally:
             self.child_1 = Node(self.x, self.y, self.width, split)
-            self.child_2 = Node(self.x, self.y + split, self.width, self.height - split)
+            self.child_2 = Node(self.x, self.y + split, self.width, self.height-split)
         else:
             self.child_1 = Node(self.x, self.y, split, self.height)
-            self.child_2 = Node(self.x + split, self.y, self.width - split, self.height)
+            self.child_2 = Node(self.x + split, self.y, self.width-split, self.height)
 
         return True
 
@@ -89,10 +93,10 @@ class Node:
 
         else:
             # Create rooms in the end branches of the bsp tree
-            w = randint(room_min_size, min(room_max_size, self.width - 1))
-            h = randint(room_min_size, min(room_max_size, self.height - 1))
-            x = randint(self.x, self.x + (self.width - 1) - w)
-            y = randint(self.y, self.y + (self.height - 1) - h)
+            w = randint(room_min_size, min(room_max_size, self.width-1))
+            h = randint(room_min_size, min(room_max_size, self.height-1))
+            x = randint(self.x, self.x+(self.width-1)-w)
+            y = randint(self.y, self.y+(self.height-1)-h)
 
             self.room = Rect(x, y, w, h)
             bsp_tree.create_room(self.room)
@@ -115,15 +119,12 @@ class Node:
             if not (self.child_1 and self.child_2):
                 # neither room_1 nor room_2
                 return None
-
             elif not self.room_2:
                 # room_1 and !room_2
                 return self.room_1
-
             elif not self.room_1:
                 # room_2 and !room_1
                 return self.room_2
-
             # If both rooms exist, pick one
             elif random() < 0.5:
                 return self.room_1
