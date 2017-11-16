@@ -21,7 +21,10 @@ from render_functions import RenderOrder
 
 
 class GameMap:
-    """Contains methods for initializing tiles and creating rooms with monsters and items."""
+    """
+    Methods for initializing tiles and creating rooms
+    with monsters and items.
+    """
 
     def __init__(self, width, height, room_min_size, room_max_size, dungeon_level=1):
         self.width = width
