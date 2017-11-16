@@ -8,7 +8,7 @@ from components.level import Level
 from entity import Entity
 from game_messages import MessageLog
 from game_states import GameStates
-from map_objects.dungeon import Tunnel, BSPTree, DrunkardsWalk
+from map_objects.dungeon_generation.tunnel import Tunnel
 from map_objects.game_map import GameMap
 from map_objects.items import dagger
 from render_functions import RenderOrder

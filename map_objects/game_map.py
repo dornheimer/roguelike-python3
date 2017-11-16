@@ -12,7 +12,9 @@ from components.inventory import Inventory
 from components.item import Item
 from entity import Entity
 from game_messages import Message
-from map_objects.dungeon import Tunnel, BSPTree, DrunkardsWalk
+from map_objects.dungeon_generation.bsp_tree import BSPTree
+from map_objects.dungeon_generation.drunkards_walk import DrunkardsWalk
+from map_objects.dungeon_generation.tunnel import Tunnel
 from map_objects.items import consumables, equipment, max_items_dungeon
 from map_objects.monsters import max_monsters_dungeon, monsters
 from map_objects.stairs import Stairs
