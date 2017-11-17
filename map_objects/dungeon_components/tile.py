@@ -13,7 +13,7 @@ class Tile:
             block_sight = blocked
         self.block_sight = block_sight
 
-        self.explored = True
+        self.explored = False
 
     def carve(self):
         self.blocked = False

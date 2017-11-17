@@ -15,7 +15,7 @@ class Tunnel(DunGen, Rectangular):
         self.room_min_size = room_min_size
         self.room_max_size = room_max_size
         self.rooms = []
-        self.max_rooms = 30
+        self.max_rooms = 50
 
     def create_dungeon(self, entities):
         """
@@ -30,8 +30,8 @@ class Tunnel(DunGen, Rectangular):
             w = randint(self.room_min_size, self.room_max_size)
             h = randint(self.room_min_size, self.room_max_size)
             # Random position without going out of the boundaries of the map
-            x = randint(0, self.width - w - 1)
-            y = randint(0, self.height - h - 1)
+            x = randint(0, self.width-w-1)
+            y = randint(0, self.height-h-1)
 
             new_room = Rect(x, y, w, h)
 
@@ -44,7 +44,7 @@ class Tunnel(DunGen, Rectangular):
 
                 if num_rooms != 0:  # all rooms after the first
                     # Connect to the previous room with a tunnel
-                    prev_room = self.rooms[num_rooms - 1]
+                    prev_room = self.rooms[num_rooms-1]
                     self.connect_rooms(new_room, prev_room)
 
                 # Append the new room to the list

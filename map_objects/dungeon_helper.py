@@ -10,18 +10,18 @@ class Rectangular:
     """
     def create_room(self, room):
         """Go through the tiles in the rectangle and make them passable."""
-        for x in range(room.x1 + 1, room.x2):
-            for y in range(room.y1 + 1, room.y2):
+        for x in range(room.x1+1, room.x2):
+            for y in range(room.y1+1, room.y2):
                 self.tiles[x][y].carve()
 
     def create_h_tunnel(self, x1, x2, y):
         """Create a horizontal tunnel."""
-        for x in range(min(x1, x2), max(x1, x2) + 1):
+        for x in range(min(x1, x2), max(x1, x2)+1):
             self.tiles[x][y].carve()
 
     def create_v_tunnel(self, y1, y2, x):
         """Create a vertical tunnel."""
-        for y in range(min(y1, y2), max(y1, y2) + 1):
+        for y in range(min(y1, y2), max(y1, y2)+1):
             self.tiles[x][y].carve()
 
     def connect_rooms(self, room1, room2):
@@ -36,4 +36,4 @@ class Rectangular:
         else:
             # Move vertically first, then horizontally
             self.create_v_tunnel(y2, y1, x2)
-            self.create_h_tunnel(x2, x1, y2)
+            self.create_h_tunnel(x2, x1, y1)
