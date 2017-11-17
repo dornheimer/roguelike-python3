@@ -29,7 +29,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
     # Keep track of targeting item
     targeting_item = None
 
-    ### GAME LOOP ###
+    # === MAIN GAME LOOP ===
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
@@ -48,7 +48,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         clear_all(con, entities)
 
-        ### PLAYER TURN ###
+        # === PLAYER TURN ===
         # Handle player action
         action = handle_keys(key, game_state)
         mouse_action = handle_mouse(mouse)
@@ -264,8 +264,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     previous_game_state = game_state
                     game_state = GameStates.LEVEL_UP
 
-
-        ### MONSTER TURN ###
+        # === MONSTER TURN ===
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
                 if entity.ai:
@@ -303,7 +302,7 @@ def main():
     """
     constants = get_constants()
 
-    ### Console ###
+    # === Console ===
     # libtcod.console_set_custom_font('terminal10x16_gs_tc.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
     libtcod.console_set_custom_font('terminal16x16_gs_ro.png', libtcod.FONT_LAYOUT_ASCII_INROW)
 
