@@ -12,20 +12,17 @@ class Rectangular:
         """Go through the tiles in the rectangle and make them passable."""
         for x in range(room.x1 + 1, room.x2):
             for y in range(room.y1 + 1, room.y2):
-                self.tiles[x][y].blocked = False
-                self.tiles[x][y].block_sight = False
+                self.tiles[x][y].carve()
 
     def create_h_tunnel(self, x1, x2, y):
         """Create a horizontal tunnel."""
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            self.tiles[x][y].blocked = False
-            self.tiles[x][y].block_sight = False
+            self.tiles[x][y].carve()
 
     def create_v_tunnel(self, y1, y2, x):
         """Create a vertical tunnel."""
         for y in range(min(y1, y2), max(y1, y2) + 1):
-            self.tiles[x][y].blocked = False
-            self.tiles[x][y].block_sight = False
+            self.tiles[x][y].carve()
 
     def connect_rooms(self, room1, room2):
         """Connect two rooms with tunnels."""

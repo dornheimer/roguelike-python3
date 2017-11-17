@@ -3,6 +3,7 @@ Handles dungeon generation and progression logic and places entities on the map.
 """
 import libtcodpy as libtcod
 from random import choice, randint
+#import random as rd
 
 from components.ai import BasicMonster
 from components.equipment import Equipment
@@ -14,6 +15,7 @@ from entity import Entity
 from game_messages import Message
 from map_objects.dungeon_generation.bsp_tree import BSPTree
 from map_objects.dungeon_generation.drunkards_walk import DrunkardsWalk
+from map_objects.dungeon_generation.maze import Maze
 from map_objects.dungeon_generation.tunnel import Tunnel
 from map_objects.items import consumables, equipment, max_items_dungeon
 from map_objects.monsters import max_monsters_dungeon, monsters
@@ -40,7 +42,8 @@ class GameMap:
         self.dun_gens = {
             Tunnel: (self.width, self.height, self.room_min_size, self.room_max_size),
             BSPTree: (self.width, self.height, self.room_min_size, self.room_max_size),
-            DrunkardsWalk: (self.width, self.height)
+            DrunkardsWalk: (self.width, self.height),
+            Maze: (self.width, self.height, self.room_min_size, 10)
         }
 
     def is_blocked(self, x, y):
@@ -54,7 +57,7 @@ class GameMap:
         self.dungeon.create_dungeon(entities)
         self.tiles = self.dungeon.tiles
 
-        if dungeon_type in (Tunnel, BSPTree):
+        if dungeon_type in (BSPTree, Maze, Tunnel):
             # Put player in first room
             player.x, player.y = self.dungeon.rooms[0].center()
 
@@ -192,7 +195,7 @@ class GameMap:
         self.dungeon_level += 1
         entities = [player]
 
-        dungeon_type = choice([Tunnel, BSPTree, DrunkardsWalk])
+        dungeon_type = choice([Tunnel, BSPTree, DrunkardsWalk, Maze])
         self.make_map(dungeon_type, player, entities)
 
         player.fighter.heal(player.fighter.max_hp // 2)

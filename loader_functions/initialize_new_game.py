@@ -38,7 +38,7 @@ def get_constants():
     map_width = 80 - panel_width
     map_height = screen_height
 
-    room_max_size = 10
+    room_max_size = 13
     room_min_size = 6
 
     fov_algorithm = 0
@@ -120,8 +120,6 @@ def get_game_variables(constants):
     game_map = GameMap(constants['map_width'], constants['map_height'],
                         constants['room_min_size'], constants['room_max_size'])
     dungeon_type = Tunnel
-    # dungeon_type = DrunkardsWalk
-    # dungeon_type = BSPTree
     game_map.make_map(dungeon_type, player, entities)
 
     # === Message log ===
