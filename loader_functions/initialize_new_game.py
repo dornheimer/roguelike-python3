@@ -43,7 +43,7 @@ def get_constants():
 
     fov_algorithm = 0
     fov_light_walls = True
-    fov_radius = 10
+    fov_radius = 4
 
     colors = {
         'dark_wall': libtcod.black,
