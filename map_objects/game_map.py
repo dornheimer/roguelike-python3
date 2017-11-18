@@ -2,8 +2,7 @@
 Handles dungeon generation and progression logic and places entities on the map.
 """
 import libtcodpy as libtcod
-from random import choice, randint
-#import random as rd
+import random as rd
 
 from components.ai import BasicMonster
 from components.equipment import Equipment
@@ -29,7 +28,6 @@ class GameMap:
     Methods for initializing tiles and creating rooms
     with monsters and items.
     """
-
     def __init__(self, width, height, room_min_size, room_max_size, dungeon_level=1):
         self.width = width
         self.height = height
@@ -71,11 +69,11 @@ class GameMap:
 
         elif dungeon_type == DrunkardsWalk:
             # Choose player and stairs location at random
-            player.x, player.y = choice(self.dungeon.cleared)
-            stairs_x, stairs_y = choice(self.dungeon.cleared)
+            player.x, player.y = rd.choice(self.dungeon.cleared)
+            stairs_x, stairs_y = rd.choice(self.dungeon.cleared)
             # Make sure they are not at the same location
             while (stairs_x, stairs_y) == (player.x, player.y):
-                stairs_x, stairs_y = choice(self.dungeon.cleared)
+                stairs_x, stairs_y = rd.choice(self.dungeon.cleared)
 
             self.place_stairs(stairs_x, stairs_y, entities)
 
@@ -137,8 +135,8 @@ class GameMap:
         max_monsters_per_room = from_dungeon_level(max_monsters_dungeon, self.dungeon_level)
         max_items_per_room = from_dungeon_level(max_items_dungeon, self.dungeon_level)
         # Get a random number of monsters and items
-        number_of_monsters = randint(0, max_monsters_per_room)
-        number_of_items = randint(0, max_items_per_room)
+        number_of_monsters = rd.randint(0, max_monsters_per_room)
+        number_of_items = rd.randint(0, max_items_per_room)
         # Generate dictionary (elem -> chance ) for the appropriate dungeon level
         monster_chances = {m['id']: from_dungeon_level(m['spawn_chance'], self.dungeon_level) for m in monsters}
         consumables_chances = {c['id']: from_dungeon_level(c['drop_chance'], self.dungeon_level) for c in consumables}
@@ -147,8 +145,8 @@ class GameMap:
         # === Monsters ===
         for i in range(number_of_monsters):
             # Choose a random location in the room
-            x = randint(room.x1 + 1, room.x2 - 1)
-            y = randint(room.y1 + 1, room.y2 - 1)
+            x = rd.randint(room.x1 + 1, room.x2 - 1)
+            y = rd.randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 monster_choice = random_choice_from_dict(monster_chances)
@@ -161,11 +159,11 @@ class GameMap:
 
         # === Items ===
         for i in range(number_of_items):
-            x = randint(room.x1 + 1, room.x2 - 1)
-            y = randint(room.y1 + 1, room.y2 - 1)
+            x = rd.randint(room.x1 + 1, room.x2 - 1)
+            y = rd.randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                select_item_pool = randint(0, 100)
+                select_item_pool = rd.randint(0, 100)
 
                 if select_item_pool < 70:
                     item_choice = random_choice_from_dict(consumables_chances)
@@ -195,7 +193,7 @@ class GameMap:
         self.dungeon_level += 1
         entities = [player]
 
-        dungeon_type = choice([Tunnel, BSPTree, DrunkardsWalk, Maze])
+        dungeon_type = rd.choice([BSPTree, DrunkardsWalk, Maze, Tunnel])
         self.make_map(dungeon_type, player, entities)
 
         player.fighter.heal(player.fighter.max_hp // 2)
