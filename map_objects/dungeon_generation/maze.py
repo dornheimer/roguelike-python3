@@ -47,7 +47,7 @@ class Maze(DunGen):
 
         self.build_room_attempts = 100
         self.extra_connector_chance = 0.04
-        self.winding_percent = 0.1
+        self.winding_percent = 0.2
         self.allow_dead_ends = False
 
     def _initialize_regions(self):

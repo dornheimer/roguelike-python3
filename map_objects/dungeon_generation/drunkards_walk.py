@@ -16,16 +16,6 @@ class DrunkardsWalk(DunGen):
         self.weighted_toward_prev_direction = 0.7
         self.zones = []
 
-    @property
-    def cleared(self):
-        """List of coordinates that have been cleared."""
-        cleared = []
-        for x, col in enumerate(self.tiles):
-            for y, tile in enumerate(col):
-                if not tile.blocked:
-                    cleared.append((x, y))
-        return cleared
-
     def scan_for_zones(self):
         sections = []
         # divide map into min_room_size sized rectangles and check if they fit
@@ -38,12 +28,10 @@ class DrunkardsWalk(DunGen):
 
         for s in sections:
             section_tiles = [(x, y) for x in range(s.x1, s.x2) for y in range(s.y1, s.y2)]
-            if all([st in self.cleared for st in section_tiles]):
+            if all([st in self.spawn_locations for st in section_tiles]):
                 # 50% chance to make zone eligible for spawning
                 if random() >= 0.5:
                     self.zones.append(s)
-
-        print(len(self.zones))
 
     def create_dungeon(self, entities):
         """Walk until either goal or maximum iterations have been reached."""
@@ -108,7 +96,6 @@ class DrunkardsWalk(DunGen):
             self.drunkard_x += dx
             self.drunkard_y += dy
             if self.tiles[self.drunkard_x][self.drunkard_y]:
-                self.tiles[self.drunkard_x][self.drunkard_y].blocked = False
-                self.tiles[self.drunkard_x][self.drunkard_y].block_sight = False
+                self.tiles[self.drunkard_x][self.drunkard_y].carve()
                 self._tiles_filled += 1
             self._prev_direction = direction

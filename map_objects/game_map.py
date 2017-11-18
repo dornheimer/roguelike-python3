@@ -13,6 +13,7 @@ from components.item import Item
 from entity import Entity
 from game_messages import Message
 from map_objects.dungeon_generation.bsp_tree import BSPTree
+from map_objects.dungeon_generation.buildings import Buildings
 from map_objects.dungeon_generation.drunkards_walk import DrunkardsWalk
 from map_objects.dungeon_generation.maze import Maze
 from map_objects.dungeon_generation.tunnel import Tunnel
@@ -40,6 +41,7 @@ class GameMap:
         self.dun_gens = {
             Tunnel: (self.width, self.height, self.room_min_size, self.room_max_size),
             BSPTree: (self.width, self.height, self.room_min_size, self.room_max_size),
+            Buildings: (self.width, self.height, self.room_min_size, self.room_max_size),
             DrunkardsWalk: (self.width, self.height),
             Maze: (self.width, self.height, self.room_min_size, 10)
         }
@@ -67,18 +69,19 @@ class GameMap:
             center_last_room_x, center_last_room_y = self.dungeon.rooms[-1].center()
             self.place_stairs(center_last_room_x, center_last_room_y, entities)
 
-        elif dungeon_type == DrunkardsWalk:
+        elif dungeon_type in (Buildings, DrunkardsWalk):
             # Choose player and stairs location at random
-            player.x, player.y = rd.choice(self.dungeon.cleared)
-            stairs_x, stairs_y = rd.choice(self.dungeon.cleared)
+            player.x, player.y = rd.choice(self.dungeon.spawn_locations)
+            stairs_x, stairs_y = rd.choice(self.dungeon.spawn_locations)
             # Make sure they are not at the same location
             while (stairs_x, stairs_y) == (player.x, player.y):
                 stairs_x, stairs_y = rd.choice(self.dungeon.cleared)
 
             self.place_stairs(stairs_x, stairs_y, entities)
 
-            for zone in self.dungeon.zones:
-                self.place_entities(zone, entities)
+            if dungeon_type == DrunkardsWalk:
+                for zone in self.dungeon.zones:
+                    self.place_entities(zone, entities)
 
     def create_item_entity(self, x, y, entity_data, is_equippable=False):
         """
