@@ -20,7 +20,7 @@ class DrunkardsWalk(DunGen):
         sections = []
         # divide map into min_room_size sized rectangles and check if they fit
         # in the dungeon layout
-        w, h = 3, 3
+        w = h = 3
 
         for x in range(0, self.width-w-1, w):
             for y in range(0, self.height-h-1, h):
