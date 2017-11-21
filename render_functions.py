@@ -8,6 +8,7 @@ from menus import character_screen, equipment_menu, inventory_menu, level_up_men
 class RenderOrder(Enum):
     """Render order in which entities will be drawn (highest last)."""
 
+    TILE = auto()
     STAIRS = auto()
     CORPSE = auto()
     ITEM = auto()
@@ -109,33 +110,27 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
     Draw all tiles on the game (FOV) map and all entities in the list (con).
     Render panel and targeting (cursor) consoles.
     """
-    ### Game map
+    # === Game map ===
     if fov_recompute:
         for y in range(game_map.height):
             for x in range(game_map.width):
                 # Checks if tiles are in FOV
                 visible = libtcod.map_is_in_fov(fov_map, x, y)
-                wall = game_map.tiles[x][y].block_sight
+                tile = game_map.tiles[x][y]
 
                 if visible:
-                    if wall:
-                        # libtcod.console_set_char_background(con, x, y, colors.get('light_wall'))
-                        libtcod.console_put_char_ex(con, x, y, '#', colors.get('light_wall_char'), colors.get('light_wall'))
-                    else:
-                        # libtcod.console_set_char_background(con, x, y, colors.get('light_ground'))
-                        libtcod.console_put_char_ex(con, x, y, '.', colors.get('light_ground_char'), colors.get('light_ground'))
+                    tile_fg = libtcod.Color(*tile.colors_lit.get("fg"))
+                    tile_bg = libtcod.Color(*tile.colors_lit.get("bg"))
+                    libtcod.console_put_char_ex(con, x, y, tile.character, tile_fg, tile_bg)
 
                     game_map.tiles[x][y].explored = True
 
                 elif game_map.tiles[x][y].explored:
-                    if wall:
-                        # libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'))
-                        libtcod.console_put_char_ex(con, x, y, '#', colors.get('dark_wall_char'), colors.get('dark_wall'))
-                    else:
-                        # libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'))
-                        libtcod.console_put_char_ex(con, x, y, '.', colors.get('dark_ground_char'), colors.get('dark_ground'))
+                    tile_fg = libtcod.Color(*tile.colors_dark.get("fg"))
+                    tile_bg = libtcod.Color(*tile.colors_dark.get("bg"))
+                    libtcod.console_put_char_ex(con, x, y, tile.character, tile_fg, tile_bg)
 
-    ### Entities
+    # === Entities ===
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
 
     for entity in entities_in_render_order:
@@ -147,7 +142,7 @@ def render_all(con, panel, cursor, entities, player, game_map, fov_map, fov_reco
     libtcod.console_set_default_background(con, colors['background_default'])
 
 
-    ### Panel console
+    # === Panel console ===
     libtcod.console_set_default_background(panel, colors['background_panel'])
     libtcod.console_clear(panel)
 

@@ -1,3 +1,5 @@
+import libtcodpy as libtcod
+
 from random import randint
 
 
@@ -37,3 +39,14 @@ class Rectangular:
             # Move vertically first, then horizontally
             self.create_v_tunnel(y2, y1, x2)
             self.create_h_tunnel(x2, x1, y1)
+
+
+def noise_2d(width, height):
+    noise = libtcod.noise_new(2)
+    noise_map = {}
+    for x in range(width):
+        for y in range(height):
+            value = libtcod.noise_get(noise, [x*0.05, y*0.05])
+            noise_map[(x, y)] = value * 50
+
+    return noise_map

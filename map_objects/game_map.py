@@ -151,7 +151,8 @@ class GameMap:
             x = rd.randint(room.x1 + 1, room.x2 - 1)
             y = rd.randint(room.y1 + 1, room.y2 - 1)
 
-            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+            tile_occupied = any([entity for entity in entities if entity.x == x and entity.y == y])
+            if not tile_occupied and self.tiles[x][y].can_spawn:
                 monster_choice = random_choice_from_dict(monster_chances)
 
                 for monster in monsters:
@@ -165,7 +166,8 @@ class GameMap:
             x = rd.randint(room.x1 + 1, room.x2 - 1)
             y = rd.randint(room.y1 + 1, room.y2 - 1)
 
-            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+            tile_occupied = any([entity for entity in entities if entity.x == x and entity.y == y])
+            if not tile_occupied and self.tiles[x][y].can_spawn:
                 select_item_pool = rd.randint(0, 100)
 
                 if select_item_pool < 70:

@@ -11,7 +11,7 @@ class Tunnel(DunGen, Rectangular):
     in the dungeon and connect them.
     """
     def __init__(self, width, height, room_min_size, room_max_size):
-        super().__init__(width, height)
+        super().__init__(width, height, noise=True)
         self.room_min_size = room_min_size
         self.room_max_size = room_max_size
         self.rooms = []
@@ -50,3 +50,5 @@ class Tunnel(DunGen, Rectangular):
                 # Append the new room to the list
                 self.rooms.append(new_room)
                 num_rooms += 1
+
+        self.apply_noise("water")

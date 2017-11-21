@@ -1,0 +1,182 @@
+{
+    "ground": {
+        "character": ".",
+        "blocked": false,
+        "block_sight": false,
+        "can_spawn": true,
+        "colors_dark": {
+            "fg": [
+                49,
+                21,
+                87
+            ],
+            "bg": [
+                0,
+                0,
+                0
+            ]
+        },
+        "colors_lit": {
+            "fg": [
+                138,
+                69,
+                38
+            ],
+            "bg": [
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "wall": {
+        "character": "#",
+        "blocked": true,
+        "block_sight": true,
+        "can_spawn": false,
+        "colors_dark": {
+            "fg": [
+                28,
+                5,
+                58
+            ],
+            "bg": [
+                0,
+                0,
+                0
+            ]
+        },
+        "colors_lit": {
+            "fg": [
+                83,
+                14,
+                83
+            ],
+            "bg": [
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "water": {
+        "character": "~",
+        "blocked": false,
+        "block_sight": false,
+        "can_spawn": false,
+        "colors_dark": {
+            "fg": [
+                0,
+                0,
+                70
+            ],
+            "bg": [
+                0,
+                42,
+                90
+            ]
+        },
+        "colors_lit": {
+            "fg": [
+                0,
+                0,
+                135
+            ],
+            "bg": [
+                0,
+                95,
+                175
+            ]
+        }
+    },
+    "poisonous_water": {
+        "character": "~",
+        "blocked": false,
+        "block_sight": false,
+        "can_spawn": false,
+        "colors_dark": {
+            "fg": [
+                0,
+                65,
+                0
+            ],
+            "bg": [
+                0,
+                42,
+                0
+            ]
+        },
+        "colors_lit": {
+            "fg": [
+                0,
+                120,
+                0
+            ],
+            "bg": [
+                0,
+                80,
+                0
+            ]
+        }
+    },
+    "mud": {
+        "character": "~",
+        "blocked": false,
+        "block_sight": false,
+        "can_spawn": false,
+        "colors_dark": {
+            "fg": [
+                62,
+                39,
+                15
+            ],
+            "bg": [
+                41,
+                26,
+                10
+            ]
+        },
+        "colors_lit": {
+            "fg": [
+                121,
+                69,
+                52
+            ],
+            "bg": [
+                62,
+                39,
+                15
+            ]
+        }
+    },
+    "glowing_liquid": {
+        "character": "~",
+        "blocked": false,
+        "block_sight": false,
+        "can_spawn": false,
+        "colors_dark": {
+            "fg": [
+                135,
+                0,
+                175
+            ],
+            "bg": [
+                95,
+                0,
+                95
+            ]
+        },
+        "colors_lit": {
+            "fg": [
+                190,
+                0,
+                235
+            ],
+            "bg": [
+                140,
+                0,
+                140
+            ]
+        }
+    }
+}

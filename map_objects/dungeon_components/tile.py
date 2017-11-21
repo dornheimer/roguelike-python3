@@ -1,3 +1,10 @@
+import json
+
+
+with open("map_objects/dungeon_components/tiles.json") as tile_data:
+    TILE_TYPES = json.load(tile_data)
+
+
 class Tile:
     """
     A tile on a map.
@@ -5,28 +12,21 @@ class Tile:
     It may or may not be blocked, and may or may not block sight.
     Some tiles prevent spawning.
     """
-
-    def __init__(self, blocked, block_sight=None, can_spawn=None):
-        self.blocked = blocked
-
-        # By default, if a tile is blocked, it also blocks sight
-        if block_sight is None:
-            block_sight = blocked
-        self.block_sight = block_sight
-
-        # Spawning on a blocked tile is not possible
-        if can_spawn is None:
-            can_spawn = not blocked
-        self.can_spawn = can_spawn
-
+    def __init__(self, tile_type="wall"):
+        self._set_type(tile_type)
         self.explored = True
 
     def carve(self):
-        self.blocked = False
-        self.block_sight = False
-        self.can_spawn = True
+        self._set_type("ground")
 
     def block(self):
-        self.blocked = True
-        self.block_sight = True
-        self.can_spawn = False
+        self._set_type("wall")
+
+    def _set_type(self, tile_type):
+        self.tile_type = tile_type
+        self.blocked = TILE_TYPES[tile_type]["blocked"]
+        self.block_sight = TILE_TYPES[tile_type]["block_sight"]
+        self.can_spawn = TILE_TYPES[tile_type]["can_spawn"]
+        self.character = TILE_TYPES[tile_type]["character"]
+        self.colors_dark = TILE_TYPES[tile_type]["colors_dark"]
+        self.colors_lit = TILE_TYPES[tile_type]["colors_lit"]
