@@ -70,7 +70,7 @@ class Maze(DunGen):
 
         return [[None for y in range(self.mz_height)] for x in range(self.mz_width)]
 
-    def create_dungeon(self, entities):
+    def create_dungeon(self):
         self.add_rooms()
 
         # Fill in the empty space around the rooms with mazes

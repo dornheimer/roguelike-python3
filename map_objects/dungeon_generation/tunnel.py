@@ -17,7 +17,7 @@ class Tunnel(DunGen, Rectangular):
         self.rooms = []
         self.max_rooms = 50
 
-    def create_dungeon(self, entities):
+    def create_dungeon(self):
         """
         The location and size of a room are chosen randomly and it will only
         be created if it does not overlap with previously created rooms.

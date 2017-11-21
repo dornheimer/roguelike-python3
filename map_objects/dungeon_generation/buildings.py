@@ -19,7 +19,7 @@ class Buildings(DunGen):
         """Fill game map with clear tiles."""
         return [[Tile(False) for y in range(self.height)] for x in range(self.width)]
 
-    def create_dungeon(self, entities):
+    def create_dungeon(self):
         for r in range(self.max_rooms):
             # Random width and height
             w = rd.randint(self.room_min_size, self.room_max_size)

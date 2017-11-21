@@ -18,7 +18,7 @@ class BSPTree(DunGen, Rectangular):
         self.max_node_size = 24
         self.rooms = []
 
-    def create_dungeon(self, entities):
+    def create_dungeon(self):
         """
         Create root node of the tree and split recursively until nodes can no
         longer split. Carve out rooms in node areas and connect.

@@ -54,7 +54,7 @@ class GameMap:
         """Carve randomly generated rooms out of the game map."""
         parameters = self.dun_gens[dungeon_type]
         self.dungeon = dungeon_type(*parameters)
-        self.dungeon.create_dungeon(entities)
+        self.dungeon.create_dungeon()
         self.tiles = self.dungeon.tiles
 
         if dungeon_type in (BSPTree, Maze, Tunnel):

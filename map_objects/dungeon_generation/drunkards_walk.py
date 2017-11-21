@@ -33,7 +33,7 @@ class DrunkardsWalk(DunGen):
                 if random() >= 0.5:
                     self.zones.append(s)
 
-    def create_dungeon(self, entities):
+    def create_dungeon(self):
         """Walk until either goal or maximum iterations have been reached."""
         self.walk_iterations = max(self.walk_iterations, (self.width * self.height * 10))
         self._tiles_filled = 0
