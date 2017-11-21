@@ -24,5 +24,5 @@ class DunGen:
         for x in range(self.width):
             for y in range(self.height):
                 n = self.noise_map[(x, y)]
-                if abs(n) > 37 and (x, y) in self.spawn_locations:
+                if abs(n) > 75 and (x, y) in self.spawn_locations:
                     self.tiles[x][y]._set_type(tile_type)

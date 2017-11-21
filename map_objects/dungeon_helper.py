@@ -46,7 +46,7 @@ def noise_2d(width, height):
     noise_map = {}
     for x in range(width):
         for y in range(height):
-            value = libtcod.noise_get(noise, [x*0.05, y*0.05])
-            noise_map[(x, y)] = value * 50
+            value = libtcod.noise_get(noise, [x*0.06, y*0.06])
+            noise_map[(x, y)] = value * 100
 
     return noise_map
