@@ -11,6 +11,9 @@ class Fighter:
         self.hp = hp
         self.base_defense = defense
         self.base_power = power
+        self.base_movement_speed = 1
+        self.movement_mod = None
+        self.turn = 0
         self.xp = xp
 
     @property
@@ -42,6 +45,12 @@ class Fighter:
             bonus = 0
 
         return self.base_defense + bonus
+
+    @property
+    def movement_speed(self):
+        if self.movement_mod:
+            return self.base_movement_speed + self.movement_mod
+        return self.base_movement_speed
 
     def take_damage(self, amount):
         """Subtract damage from Fighter hp and return 'dead' if hp <= 0."""

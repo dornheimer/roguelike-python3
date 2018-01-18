@@ -3,6 +3,7 @@
         "character": ".",
         "blocked": false,
         "block_sight": false,
+        "movement_mod": null,
         "can_spawn": true,
         "colors_dark": {
             "fg": [
@@ -34,6 +35,7 @@
         "blocked": true,
         "block_sight": true,
         "can_spawn": false,
+        "movement_mod": null,
         "colors_dark": {
             "fg": [
                 28,
@@ -64,6 +66,7 @@
         "blocked": false,
         "block_sight": false,
         "can_spawn": false,
+        "movement_mod": 0.25,
         "colors_dark": {
             "fg": [
                 0,

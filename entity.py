@@ -62,6 +62,22 @@ class Entity:
         self.x += dx
         self.y += dy
 
+    def take_step(self, dx, dy, game_map):
+        movement_mod = game_map.tiles[self.x][self.y].movement_mod
+        self.fighter.movement_mod = movement_mod
+        print(self.name, self.fighter.movement_mod)
+
+        if self.fighter and movement_mod is not None:
+            penalty_interval = 1 / movement_mod
+            self.fighter.turn += 1
+            if self.fighter.turn == penalty_interval:
+                dx = dy = 0
+                self.fighter.turn = 0
+                print(f"{self.name} skipped a turn")
+
+        self.move(dx, dy)
+
+
     def move_towards(self, target_x, target_y, game_map, entities):
         """Move towards target if map tile is passable and no blocking entities
         are at the location."""
@@ -74,7 +90,7 @@ class Entity:
 
         if not (game_map.is_blocked(self.x + dx, self.y + dy) or
                 get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
-            self.move(dx, dy)
+            self.take_step(dx, dy, game_map)
 
     def distance(self, x, y):
         """Return distance between entity and arbitrary point."""

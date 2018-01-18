@@ -84,7 +84,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     attack_results = player.fighter.attack(target)
                     player_turn_results.extend(attack_results)
                 else:
-                    player.move(dx, dy)
+                    player.take_step(dx, dy, game_map)
 
                     # Recompute FOV everytime the player moves
                     fov_recompute = True

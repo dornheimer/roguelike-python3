@@ -27,6 +27,8 @@ class Tile:
         self.blocked = TILE_TYPES[tile_type]["blocked"]
         self.block_sight = TILE_TYPES[tile_type]["block_sight"]
         self.can_spawn = TILE_TYPES[tile_type]["can_spawn"]
+        self.movement_mod = TILE_TYPES[tile_type]["movement_mod"]
+
         self.character = TILE_TYPES[tile_type]["character"]
         self.colors_dark = TILE_TYPES[tile_type]["colors_dark"]
         self.colors_lit = TILE_TYPES[tile_type]["colors_lit"]
