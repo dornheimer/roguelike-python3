@@ -16,3 +16,18 @@ over time, i added some features of my own:
 + new menu background (source image by christopher balaskas)
 + monsters can have starting equipment
 + implemented some alternative dungeon generation algorithms (i used [AtTheMatinee's code](https://github.com/AtTheMatinee/dungeon-generation) for reference)
+
+
+## installation
+requires: python 3.6
+
+**linux**
+
+1. clone repo `git clone https://github.com/dornheimer`
+2. run *engine.py*
+
+**windows**
+
+1. clone repo `git clone https://github.com/dornheimer`
+2. follow intructions [here](http://www.roguebasin.com/index.php?title=Complete_Roguelike_Tutorial,_using_python%2Blibtcod,_part_1#Setting_it_up) to download missing libtcod dlls
+3. run *engine.py*
